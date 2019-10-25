@@ -9,6 +9,8 @@ const logger = require('koa-logger')
 const index = require('./routes/index')
 const users = require('./routes/users')
 const api = require('./routes/api')
+
+const tokenVerify = require('./middleware/auth')
 // error handler
 onerror(app)
 
@@ -27,6 +29,8 @@ app.use(
     extension: 'pug'
   })
 )
+
+app.use(tokenVerify())
 
 // logger
 app.use(async (ctx, next) => {
