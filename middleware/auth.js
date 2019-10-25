@@ -14,7 +14,7 @@ var hasOwnProperty = Object.hasOwnProperty
  * @api public
  */
 
-module.exports = function({ directPath } = {}) {
+module.exports = function({directPath} = {}) {
   // var opts = opts || {}
   // var param = opts.param
   // var pretty = null == opts.pretty ? true : opts.pretty
@@ -25,17 +25,15 @@ module.exports = function({ directPath } = {}) {
     if (enterAuth) {
       if (ifTokenExist()) {
         let token = getToken(ctx)
-        let result = await verifyToken(token, config.jwtsecret).catch(err => {
-          ctx.throw(401, 'Bad token"')
-        })
+        let result = await verifyToken(token, config.jwtsecret)
         console.log(result)
-        return next()
+        next()
       } else {
         ctx.status = 401
         ctx.body = 'token'
       }
     } else {
-      return next()
+      next()
     }
   }
 }
