@@ -1,3 +1,4 @@
+//废弃
 var Image = require('../../../models/image')
 var jwt = require('jsonwebtoken') // 使用jwt签名
 var config = require('../../../config') // 使用jwt签名

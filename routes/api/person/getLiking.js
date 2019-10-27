@@ -3,10 +3,10 @@ var User = require('../../../models/user')
 
 var ObjectID = require('mongodb').ObjectID
 var user =async function(ctx, next) {
-  let id = ctx.request.params.id
+  let id = ctx.params.id
   let user =await User.findOne({ _id: id })
   if (user){
-    let idArr = content.liking.map(sid => {
+    let idArr = user.liking.map(sid => {
       return ObjectID(sid.personid)
     })
     let persons=await Person.find(
@@ -22,7 +22,7 @@ var user =async function(ctx, next) {
     }else{
       ctx.body={
         status: 2,
-        msg: err || '无此人物'
+        msg:  '无此人物'
       }
     }
   }
