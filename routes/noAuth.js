@@ -1,6 +1,6 @@
 const router = require('koa-router')()
 const Article = require('../models/article')
-const users = require('./users')
+const users = require('./users/index')
 const upload = require('./upload')
 router.prefix('/noauth')
 

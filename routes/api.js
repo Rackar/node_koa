@@ -1,6 +1,9 @@
 const multer = require('koa-multer')
 
 const router = require('koa-router')()
+const person = require('./api/person/index')
+
+
 const Article = require('../models/article')
 router.prefix('/api')
 
@@ -28,5 +31,7 @@ router.post('/article', async function(ctx, next) {
     msg: '新增成功'
   }
 })
+
+router.use(person.routes(), person.allowedMethods()) // /person
 
 module.exports = router

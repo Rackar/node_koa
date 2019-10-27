@@ -14,7 +14,31 @@ const storage = multer.diskStorage({
 const upload = multer({storage: storage})
 
 router.post('/image', upload.single('avatar'), function(ctx, next) {
-  ctx.body = 'ok'
+  let data = {
+    path: ctx.req.file.path,
+    filename: ctx.req.file.filename,
+    contentType: ctx.req.file.mimetype
+  }
+
+  ctx.body ={
+    status: 1,
+    msg: '上传图片成功',
+    data: data
+  }
 })
+
+// router.post('/image', upload.single('avatar').then((ctx, next) =>{
+//   let data = {
+//     path: ctx.request.file.path,
+//     filename: ctx.request.file.filename,
+//     contentType: ctx.request.file.mimetype
+//   }
+
+//   ctx.body ={
+//     status: 1,
+//     msg: '上传图片成功',
+//     data: data
+//   }
+// }))
 
 module.exports = router

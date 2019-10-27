@@ -5,8 +5,32 @@ var UserSchema = new Schema({
   username: {
     type: String
   },
-  password: {
+  mobile: {
     type: String
+  },
+  pwd: {
+    type: String
+  },
+  articles: [
+    {
+      _id: Schema.Types.ObjectId,
+      title: String
+    }
+  ],
+  following: [],
+  followed: [],
+  liking: [],
+  info: '',
+  avatar: {
+    type: String
+  },
+  count: {
+    followed: Number,
+    following: Number,
+    like: Number,
+    liked: Number,
+    articles: Number,
+    words: Number
   }
 })
 module.exports = mongoose.model('User', UserSchema)

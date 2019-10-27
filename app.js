@@ -14,17 +14,17 @@ const config = require('./config/index')
 // error handler
 // onerror(app)
 
-// Custom 401 handling if you don't want to expose koa-jwt errors to users
-app.use(function(ctx, next) {
-  return next().catch(err => {
-    if (401 == err.status) {
-      ctx.status = 401
-      ctx.body = 'Protected resource, use Authorization header to get access\n'
-    } else {
-      throw err
-    }
-  })
-})
+// // Custom 401 handling if you don't want to expose koa-jwt errors to users
+// app.use(function(ctx, next) {
+//   return next().catch(err => {
+//     if (401 == err.status) {
+//       ctx.status = 401
+//       ctx.body = 'Protected resource, use Authorization header to get access\n'
+//     } else {
+//       throw err
+//     }
+//   })
+// })
 
 // 解决跨域和options请求问题，集中处理错误
 const handler = async (ctx, next) => {
@@ -32,7 +32,7 @@ const handler = async (ctx, next) => {
   ctx.set('Access-Control-Allow-Origin', '*')
   ctx.set(
     'Access-Control-Allow-Methods',
-    'POST, GET, OPTIONS,PATCH,HEAD,PUT, DELETE'
+    'POST, GET, OPTIONS, PATCH, HEAD, PUT, DELETE'
   )
   ctx.set('Access-Control-Max-Age', '3600')
   ctx.set(
@@ -44,18 +44,19 @@ const handler = async (ctx, next) => {
     ctx.response.status = 200
   } else {
     console.log(`Process ${ctx.request.method} ${ctx.request.url}`)
-  }
-
-  try {
-    await next()
-    console.log('handler通过')
-  } catch (err) {
-    console.log('handler处理错误')
-    ctx.response.status = err.statusCode || err.status || 500
-    ctx.response.body = {
-      message: err.message
+    try {
+      await next()
+      console.log('handler通过')
+    } catch (err) {
+      console.log('handler处理错误')
+      ctx.response.status = err.statusCode || err.status || 500
+      ctx.response.body = {
+        message: err.message
+      }
     }
   }
+
+  
 }
 
 // middlewares
@@ -67,7 +68,6 @@ app.use(
 app.use(json())
 app.use(logger())
 app.use(require('koa-static')(__dirname + '/uploads'))
-// app.use(require('koa-static')(__dirname + '/uploads'))
 // app.use(
 //   views(__dirname + '/views', {
 //     extension: 'pug'
@@ -85,9 +85,11 @@ app.use(async (ctx, next) => {
 
 app.use(
   jwt({secret: config.jwtsecret}).unless({
-    path: [/^\/public/, /^\/uploads/, /^\/noauth/]
+    path: [ /^\/noauth/]
+    // path: [/^\/public/, /^\/uploads/, /^\/noauth/]
   })
 )
+
 // routes
 app.use(noauth.routes(), noauth.allowedMethods())
 app.use(api.routes(), api.allowedMethods())
