@@ -4,8 +4,8 @@ const jwt = require('jsonwebtoken')
 const config = require('../config')
 
 router.post('/login', async function(ctx, next) {
-  let { username, password } = ctx.request.body
-  let result = await User.findOne({ username, password })
+  let {username, password} = ctx.request.body
+  let result = await User.findOne({username, password})
 
   if (result) {
     let token = jwt.sign(
@@ -32,7 +32,7 @@ router.post('/login', async function(ctx, next) {
 })
 
 router.post('/signup', async function(ctx, next) {
-  let { username, password } = ctx.request.body
+  let {username, password} = ctx.request.body
   var user = await new User({
     username,
     password

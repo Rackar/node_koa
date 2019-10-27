@@ -26,6 +26,38 @@ app.use(function(ctx, next) {
   })
 })
 
+// 解决跨域和options请求问题，集中处理错误
+const handler = async (ctx, next) => {
+  // log request URL:
+  ctx.set('Access-Control-Allow-Origin', '*')
+  ctx.set(
+    'Access-Control-Allow-Methods',
+    'POST, GET, OPTIONS,PATCH,HEAD,PUT, DELETE'
+  )
+  ctx.set('Access-Control-Max-Age', '3600')
+  ctx.set(
+    'Access-Control-Allow-Headers',
+    'x-requested-with,Authorization,Content-Type,Accept'
+  )
+  ctx.set('Access-Control-Allow-Credentials', 'true')
+  if (ctx.request.method == 'OPTIONS') {
+    ctx.response.status = 200
+  } else {
+    console.log(`Process ${ctx.request.method} ${ctx.request.url}`)
+  }
+
+  try {
+    await next()
+    console.log('handler通过')
+  } catch (err) {
+    console.log('handler处理错误')
+    ctx.response.status = err.statusCode || err.status || 500
+    ctx.response.body = {
+      message: err.message
+    }
+  }
+}
+
 // middlewares
 app.use(
   bodyparser({
@@ -34,13 +66,14 @@ app.use(
 )
 app.use(json())
 app.use(logger())
-app.use(require('koa-static')(__dirname + '/public'))
-
+app.use(require('koa-static')(__dirname + '/uploads'))
+// app.use(require('koa-static')(__dirname + '/uploads'))
 // app.use(
 //   views(__dirname + '/views', {
 //     extension: 'pug'
 //   })
 // )
+app.use(handler)
 
 // logger
 app.use(async (ctx, next) => {
@@ -51,7 +84,9 @@ app.use(async (ctx, next) => {
 })
 
 app.use(
-  jwt({secret: config.jwtsecret}).unless({path: [/^\/public/, /^\/noauth/]})
+  jwt({secret: config.jwtsecret}).unless({
+    path: [/^\/public/, /^\/uploads/, /^\/noauth/]
+  })
 )
 // routes
 app.use(noauth.routes(), noauth.allowedMethods())

@@ -1,6 +1,7 @@
 const router = require('koa-router')()
 const Article = require('../models/article')
 const users = require('./users')
+const upload = require('./upload')
 router.prefix('/noauth')
 
 router.get('/article', async function(ctx, next) {
@@ -16,6 +17,6 @@ router.get('/article', async function(ctx, next) {
   ctx.body = result
 })
 
-router.use(users.routes(), users.allowedMethods())
-
+router.use(users.routes(), users.allowedMethods()) // /login  /signup
+router.use(upload.routes(), upload.allowedMethods()) // /upload
 module.exports = router
