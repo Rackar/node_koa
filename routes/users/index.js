@@ -8,10 +8,9 @@ router.post('/login', async function(ctx, next) {
   let result = await User.findOne({mobile, pwd})
 
   if (result) {
-    
     let token = jwt.sign(
       {
-        username:result.username, //payload部分可解密获取，不能放敏感信息
+        username: result.username, //payload部分可解密获取，不能放敏感信息
         userid: result.id,
         mobile
       },
@@ -24,13 +23,13 @@ router.post('/login', async function(ctx, next) {
       userid: result.id,
       username: result.username,
       mobile: result.mobile,
-      token:'Bearer '+ token,
+      token: 'Bearer ' + token,
       liking: result.liking
     }
     ctx.body = {
       msg: '登录成功',
-      data:userData ,
-      status: 1,
+      data: userData,
+      status: 1
     }
   } else {
     ctx.response.status = 401
@@ -43,26 +42,26 @@ router.post('/login', async function(ctx, next) {
 })
 
 router.post('/signup', async function(ctx, next) {
-  let {username, pwd,mobile} = ctx.request.body
+  let {username, pwd, mobile} = ctx.request.body
   let existUser = await User.find({mobile})
-  if(existUser.length!==0) {
+  if (existUser.length !== 0) {
     ctx.response.status = 401
     ctx.body = {
       msg: '用户已存在',
       data: null,
       status: 0
     }
-  }else{
-    var user =  new User({
+  } else {
+    var user = new User({
       username,
-      pwd,mobile
+      pwd,
+      mobile
     })
     await user.save()
     ctx.body = {
       msg: '注册成功'
     }
   }
-  
 })
 
 module.exports = router

@@ -2,7 +2,7 @@
 // var router = express.Router();
 var Person = require('../../../models/person')
 var ObjectID = require('mongodb').ObjectID
-var addComment =async function(ctx, next) {
+var addComment = async function(ctx, next) {
   // res.send('respond with a resource');
   let params = ctx.request.body
   let photos = params.photos.map(photo => {
@@ -13,13 +13,13 @@ var addComment =async function(ctx, next) {
     }
   })
 
- let person=await Person.updateOne(
+  let person = await Person.updateOne(
     {
       _id: ObjectID(params.personid)
     },
     {
       $addToSet: {
-        photos: { $each: photos }
+        photos: {$each: photos}
       }
     }
     // ,
@@ -38,11 +38,11 @@ var addComment =async function(ctx, next) {
     //   }
     // }
   )
-  if(person){
-    ctx.body={
-                status: 1,
-          msg: '照片发布成功',
-          data: person
+  if (person) {
+    ctx.body = {
+      status: 1,
+      msg: '照片发布成功',
+      data: person
     }
   }
 }

@@ -5,7 +5,7 @@ var person = function(ctx, next) {
 
   Person.find(
     {
-      _id: { $in: idArr }
+      _id: {$in: idArr}
     },
     function(err, body) {
       if (err || !body) {

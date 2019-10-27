@@ -3,104 +3,105 @@
 var Person = require('../../../models/person')
 var User = require('../../../models/user')
 var ObjectID = require('mongodb').ObjectID
-var like =async function(ctx, next) {
+var like = async function(ctx, next) {
   // res.send('respond with a resource');
   let params = ctx.request.body
 
-  let person=await Person.findOne(
+  let person = await Person.findOne(
     {
       _id: ObjectID(params._id),
       'liked.userid': params.userid
     },
     {
       'liked.$': 1
-    })
-    if(person){
-      let updataPerson=await Person.updateOne(
-        {
-          _id: ObjectID(params._id)
-        },
-        {
-          $pull: {
-            liked: {
-              userid: params.userid
-            }
-          }
-        })
-      if(updataPerson){
-       let user=await User.findOne(
-          {
-            _id: ObjectID(params.userid),
-            'liking.personid': params._id
-          },
-          {
-            'liking.$': 1
-          }
-        )
-
-        if(user){
-          let updateUser=await User.updateOne(
-            {
-              _id: ObjectID(params.userid)
-            },
-            {
-              $pull: {
-                liking: {
-                  personid: params._id
-                }
-              }
-            })
-          if(updateUser){
-            ctx.body={
-              msg:'取消收藏成功'
-            }
+    }
+  )
+  if (person) {
+    let updataPerson = await Person.updateOne(
+      {
+        _id: ObjectID(params._id)
+      },
+      {
+        $pull: {
+          liked: {
+            userid: params.userid
           }
         }
       }
-    }else{
-     let newPerson=await Person.updateOne(
+    )
+    if (updataPerson) {
+      let user = await User.findOne(
         {
-          _id: ObjectID(params._id)
+          _id: ObjectID(params.userid),
+          'liking.personid': params._id
+        },
+        {
+          'liking.$': 1
+        }
+      )
+
+      if (user) {
+        let updateUser = await User.updateOne(
+          {
+            _id: ObjectID(params.userid)
+          },
+          {
+            $pull: {
+              liking: {
+                personid: params._id
+              }
+            }
+          }
+        )
+        if (updateUser) {
+          ctx.body = {
+            msg: '取消收藏成功'
+          }
+        }
+      }
+    }
+  } else {
+    let newPerson = await Person.updateOne(
+      {
+        _id: ObjectID(params._id)
+      },
+      {
+        $addToSet: {
+          liked: [
+            {
+              userid: params.userid,
+              username: params.username
+            }
+          ]
+        }
+      }
+    )
+    if (newPerson) {
+      let newUser = await User.updateOne(
+        {
+          _id: ObjectID(params.userid)
         },
         {
           $addToSet: {
-            liked: [
+            liking: [
               {
-                userid: params.userid,
-                username: params.username
+                personid: params._id
               }
             ]
           }
-        })
-        if(newPerson){
-         let newUser=await User.updateOne(
-            {
-              _id: ObjectID(params.userid)
-            },
-            {
-              $addToSet: {
-                liking: [
-                  {
-                    personid: params._id
-                  }
-                ]
-              }
-            })
-          if(newUser){
-            ctx.body={
-              msg:'收藏成功'
-            }
-          }else{
-            ctx.body={
-              msg:'收藏失败'
-            }
-          }
         }
+      )
+      if (newUser) {
+        ctx.body = {
+          msg: '收藏成功'
+        }
+      } else {
+        ctx.body = {
+          msg: '收藏失败'
+        }
+      }
     }
-
-
-
-
+  }
 
   // Person.findOne(
   //   {

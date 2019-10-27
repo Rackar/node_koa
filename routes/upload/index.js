@@ -20,7 +20,7 @@ router.post('/image', upload.single('avatar'), function(ctx, next) {
     contentType: ctx.req.file.mimetype
   }
 
-  ctx.body ={
+  ctx.body = {
     status: 1,
     msg: '上传图片成功',
     data: data
