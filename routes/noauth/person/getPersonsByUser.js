@@ -1,24 +1,24 @@
-var Person = require('../../../models/person')
-var jwt = require('jsonwebtoken') // 使用jwt签名
-var config = require('../../../config') // 使用jwt签名
-var ObjectID = require('mongodb').ObjectID
+var Person = require("../../../models/person");
+var jwt = require("jsonwebtoken"); // 使用jwt签名
+var config = require("../../../config"); // 使用jwt签名
+var ObjectID = require("mongodb").ObjectID;
 var user = async function(ctx, next) {
-  var id = ctx.params.id
+  var id = ctx.params.id;
   let persons = await Person.find({
     createrId: id
-  })
+  });
   if (persons && persons.length) {
     ctx.body = {
       data: persons,
       status: 1,
-      msg: '拉取用户成功'
-    }
+      msg: "拉取用户成功"
+    };
   } else {
     ctx.body = {
       data: null,
       status: 2,
-      msg: '无数据'
-    }
+      msg: "无数据"
+    };
   }
   // ,
   // function(err, body) {
@@ -49,5 +49,5 @@ var user = async function(ctx, next) {
   //   }
   // }
   // )
-}
-module.exports = user
+};
+module.exports = user;

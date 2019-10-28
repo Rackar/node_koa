@@ -1,5 +1,5 @@
-var mongoose = require('../api/db_mongoose')
-var Schema = mongoose.Schema
+var mongoose = require("../api/db_mongoose");
+var Schema = mongoose.Schema;
 
 var UserSchema = new Schema({
   username: {
@@ -20,7 +20,7 @@ var UserSchema = new Schema({
   following: [],
   followed: [],
   liking: [],
-  info: '',
+  info: "",
   avatar: {
     type: String
   },
@@ -32,5 +32,5 @@ var UserSchema = new Schema({
     articles: Number,
     words: Number
   }
-})
-module.exports = mongoose.model('User', UserSchema)
+});
+module.exports = mongoose.model("User", UserSchema);

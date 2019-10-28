@@ -1,31 +1,31 @@
-const router = require('koa-router')()
-const multer = require('koa-multer')
+const router = require("koa-router")();
+const multer = require("koa-multer");
 
-router.prefix('/upload')
+router.prefix("/upload");
 
 const storage = multer.diskStorage({
   destination: function(req, file, cb) {
-    cb(null, 'uploads/')
+    cb(null, "uploads/");
   },
   filename: function(req, file, cb) {
-    cb(null, file.fieldname + '-' + Date.now() + file.originalname)
+    cb(null, file.fieldname + "-" + Date.now() + file.originalname);
   }
-})
-const upload = multer({storage: storage})
+});
+const upload = multer({ storage: storage });
 
-router.post('/image', upload.single('avatar'), function(ctx, next) {
+router.post("/image", upload.single("avatar"), function(ctx, next) {
   let data = {
     path: ctx.req.file.path,
     filename: ctx.req.file.filename,
     contentType: ctx.req.file.mimetype
-  }
+  };
 
   ctx.body = {
     status: 1,
-    msg: '上传图片成功',
+    msg: "上传图片成功",
     data: data
-  }
-})
+  };
+});
 
 // router.post('/image', upload.single('avatar').then((ctx, next) =>{
 //   let data = {
@@ -41,4 +41,4 @@ router.post('/image', upload.single('avatar'), function(ctx, next) {
 //   }
 // }))
 
-module.exports = router
+module.exports = router;

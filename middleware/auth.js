@@ -1,7 +1,7 @@
-const jwt = require('jsonwebtoken')
-const config = require('../config')
+const jwt = require("jsonwebtoken");
+const config = require("../config");
 
-var hasOwnProperty = Object.hasOwnProperty
+var hasOwnProperty = Object.hasOwnProperty;
 
 /**
  * Pretty JSON response middleware.
@@ -14,59 +14,59 @@ var hasOwnProperty = Object.hasOwnProperty
  * @api public
  */
 
-module.exports = function({directPath} = {}) {
+module.exports = function({ directPath } = {}) {
   // var opts = opts || {}
   // var param = opts.param
   // var pretty = null == opts.pretty ? true : opts.pretty
   // var spaces = opts.spaces || 2
 
   return async function checkJWT(ctx, next) {
-    let enterAuth = ifPathNeedAuth(directPath, ctx.request.url)
+    let enterAuth = ifPathNeedAuth(directPath, ctx.request.url);
     if (enterAuth) {
       if (ifTokenExist()) {
-        let token = getToken(ctx)
-        let result = await verifyToken(token, config.jwtsecret)
-        console.log(result)
-        next()
+        let token = getToken(ctx);
+        let result = await verifyToken(token, config.jwtsecret);
+        console.log(result);
+        next();
       } else {
-        ctx.status = 401
-        ctx.body = 'token'
+        ctx.status = 401;
+        ctx.body = "token";
       }
     } else {
-      next()
+      next();
     }
-  }
-}
+  };
+};
 
 function ifPathNeedAuth(directPath, requestUrl) {
   if (Array.isArray(directPath)) {
-    return directPath.findIndex(requestUrl) == -1
+    return directPath.findIndex(requestUrl) == -1;
   } else {
-    return true
+    return true;
   }
 }
 function ifTokenExist(ctx) {
-  return true
+  return true;
 }
 function getToken(ctx) {
   let token =
     ctx.request.body.token ||
     ctx.request.query.token ||
-    (ctx.request.headers && ctx.request.headers['authorization'])
-  return token
+    (ctx.request.headers && ctx.request.headers["authorization"]);
+  return token;
 }
 function verifyToken(token, secret) {
   return new Promise((resolve, reject) => {
     jwt.verify(token, secret, function(err, decoded) {
       if (err) {
-        return reject()
+        return reject();
       } else {
         if (decoded) {
-          return resolve(decoded)
+          return resolve(decoded);
         } else {
-          return reject()
+          return reject();
         }
       }
-    })
-  })
+    });
+  });
 }

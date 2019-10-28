@@ -1,5 +1,5 @@
-var mongoose = require('../api/db_mongoose')
-var Schema = mongoose.Schema
+var mongoose = require("../api/db_mongoose");
+var Schema = mongoose.Schema;
 
 var ArticleSchema = new Schema({
   userid: Schema.Types.ObjectId,
@@ -27,5 +27,5 @@ var ArticleSchema = new Schema({
       publicdate: Date
     }
   ]
-})
-module.exports = mongoose.model('Article', ArticleSchema)
+});
+module.exports = mongoose.model("Article", ArticleSchema);

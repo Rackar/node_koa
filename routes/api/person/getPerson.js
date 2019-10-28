@@ -1,7 +1,7 @@
-var Person = require('../../../models/person')
-var ObjectID = require('mongodb').ObjectID
+var Person = require("../../../models/person");
+var ObjectID = require("mongodb").ObjectID;
 var user = async function(ctx, next) {
-  var id = ctx.params.id
+  var id = ctx.params.id;
   let person = await Person.findOne(
     {
       _id: ObjectID(id)
@@ -34,13 +34,13 @@ var user = async function(ctx, next) {
     //     })
     //   }
     // }
-  )
+  );
   if (person) {
     ctx.body = {
       status: 1,
-      msg: '拉取用户成功',
+      msg: "拉取用户成功",
       data: person
-    }
+    };
   }
-}
-module.exports = user
+};
+module.exports = user;

@@ -1,10 +1,10 @@
 // var express = require('./node_modules/express');
 // var router = express.Router();
-var Person = require('../../../models/person')
-var ObjectID = require('mongodb').ObjectID
+var Person = require("../../../models/person");
+var ObjectID = require("mongodb").ObjectID;
 var addComment = async function(ctx, next) {
   // res.send('respond with a resource');
-  let params = ctx.request.body
+  let params = ctx.request.body;
 
   let person = await Person.updateOne(
     {
@@ -36,13 +36,13 @@ var addComment = async function(ctx, next) {
     //     })
     //   }
     // }
-  )
+  );
   if (person) {
     ctx.body = {
       status: 1,
-      msg: '文章发布成功'
-    }
+      msg: "文章发布成功"
+    };
   }
-}
+};
 
-module.exports = addComment
+module.exports = addComment;

@@ -1,5 +1,5 @@
-var mongoose = require('../api/db_mongoose')
-var Schema = mongoose.Schema
+var mongoose = require("../api/db_mongoose");
+var Schema = mongoose.Schema;
 // var List =  require("./list");
 // var Image =require('./image.js');
 
@@ -54,5 +54,5 @@ var PersonSchema = new Schema({
     articles: Number,
     words: Number
   }
-})
-module.exports = mongoose.model('Person', PersonSchema)
+});
+module.exports = mongoose.model("Person", PersonSchema);

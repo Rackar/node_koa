@@ -1,6 +1,6 @@
-var Person = require('../../../models/person')
+var Person = require("../../../models/person");
 var signup = async function(ctx, next) {
-  var body = ctx.request.body
+  var body = ctx.request.body;
   // var newid = new ObjectID()
   var regperson = new Person({
     // _id: newid,
@@ -10,7 +10,7 @@ var signup = async function(ctx, next) {
     info: body.info,
     avatarfilePath: body.avatarfilePath
       ? body.avatarfilePath
-      : 'default/person.png',
+      : "default/person.png",
     createrId: body.createrId,
     articles: [],
     photo: [],
@@ -23,9 +23,9 @@ var signup = async function(ctx, next) {
       articles: 1,
       words: 1
     }
-  })
+  });
 
-  let result = await regperson.save()
+  let result = await regperson.save();
   // (function(err, content) {
   //   if (err) {
   //     // return res.send({
@@ -55,17 +55,17 @@ var signup = async function(ctx, next) {
   // })
   if (result)
     ctx.body = {
-      msg: '新增人物成功',
-      data: {id: result.id},
+      msg: "新增人物成功",
+      data: { id: result.id },
       status: 1
-    }
+    };
   else {
-    ctx.response.status = 400
+    ctx.response.status = 400;
     ctx.body = {
-      msg: '新增人物失败',
+      msg: "新增人物失败",
       data: null,
       status: 2
-    }
+    };
   }
-}
-module.exports = signup
+};
+module.exports = signup;

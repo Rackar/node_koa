@@ -1,14 +1,14 @@
-const router = require('koa-router')()
+const router = require("koa-router")();
 
-var person = require('./getPerson')
-var user = require('./getPersonsByUser')
+var person = require("./getPerson");
+var user = require("./getPersonsByUser");
 
 /* GET users listing. */
 
-router.prefix('/person')
+router.prefix("/person");
 
-router.get('/:id', person)
+router.get("/:id", person);
 
-router.get('/user/:id', user)
+router.get("/user/:id", user);
 
-module.exports = router
+module.exports = router;

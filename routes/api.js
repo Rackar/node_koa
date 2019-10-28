@@ -1,37 +1,36 @@
-const multer = require('koa-multer')
+const multer = require("koa-multer");
 
-const router = require('koa-router')()
-const person = require('./api/person/index')
+const router = require("koa-router")();
+const person = require("./api/person/index");
 
-
-const Article = require('../models/article')
-router.prefix('/api')
+const Article = require("../models/article");
+router.prefix("/api");
 
 var storage = multer.diskStorage({
   destination: function(req, file, cb) {
-    cb(null, 'uploads/')
+    cb(null, "uploads/");
     // cb(null, 'public/uploads/')
   },
   filename: function(req, file, cb) {
-    cb(null, file.fieldname + '-' + Date.now() + file.originalname)
+    cb(null, file.fieldname + "-" + Date.now() + file.originalname);
   }
-})
-const upload = multer({storage: storage})
+});
+const upload = multer({ storage: storage });
 
-router.post('/image', upload.single('avatar'))
-router.post('/article', async function(ctx, next) {
-  let body = ctx.request.body
+router.post("/image", upload.single("avatar"));
+router.post("/article", async function(ctx, next) {
+  let body = ctx.request.body;
   var article = await new Article({
     content: ctx.request.body.content,
     title: ctx.request.body.title
-  })
-  article.save()
+  });
+  article.save();
 
   ctx.body = {
-    msg: '新增成功'
-  }
-})
+    msg: "新增成功"
+  };
+});
 
-router.use(person.routes(), person.allowedMethods()) // /person
+router.use(person.routes(), person.allowedMethods()); // /person
 
-module.exports = router
+module.exports = router;

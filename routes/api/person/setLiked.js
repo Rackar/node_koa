@@ -1,21 +1,21 @@
 // var express = require('./node_modules/express');
 // var router = express.Router();
-var Person = require('../../../models/person')
-var User = require('../../../models/user')
-var ObjectID = require('mongodb').ObjectID
+var Person = require("../../../models/person");
+var User = require("../../../models/user");
+var ObjectID = require("mongodb").ObjectID;
 var like = async function(ctx, next) {
   // res.send('respond with a resource');
-  let params = ctx.request.body
+  let params = ctx.request.body;
 
   let person = await Person.findOne(
     {
       _id: ObjectID(params._id),
-      'liked.userid': params.userid
+      "liked.userid": params.userid
     },
     {
-      'liked.$': 1
+      "liked.$": 1
     }
-  )
+  );
   if (person) {
     let updataPerson = await Person.updateOne(
       {
@@ -28,17 +28,17 @@ var like = async function(ctx, next) {
           }
         }
       }
-    )
+    );
     if (updataPerson) {
       let user = await User.findOne(
         {
           _id: ObjectID(params.userid),
-          'liking.personid': params._id
+          "liking.personid": params._id
         },
         {
-          'liking.$': 1
+          "liking.$": 1
         }
-      )
+      );
 
       if (user) {
         let updateUser = await User.updateOne(
@@ -52,11 +52,11 @@ var like = async function(ctx, next) {
               }
             }
           }
-        )
+        );
         if (updateUser) {
           ctx.body = {
-            msg: '取消收藏成功'
-          }
+            msg: "取消收藏成功"
+          };
         }
       }
     }
@@ -75,7 +75,7 @@ var like = async function(ctx, next) {
           ]
         }
       }
-    )
+    );
     if (newPerson) {
       let newUser = await User.updateOne(
         {
@@ -90,15 +90,15 @@ var like = async function(ctx, next) {
             ]
           }
         }
-      )
+      );
       if (newUser) {
         ctx.body = {
-          msg: '收藏成功'
-        }
+          msg: "收藏成功"
+        };
       } else {
         ctx.body = {
-          msg: '收藏失败'
-        }
+          msg: "收藏失败"
+        };
       }
     }
   }
@@ -227,6 +227,6 @@ var like = async function(ctx, next) {
   //   // res.send(200,result);
   //   // res.status(200).send({ status: 1, msg: "获取成功", data: result });
   // })
-}
+};
 
-module.exports = like
+module.exports = like;
