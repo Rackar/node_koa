@@ -3,7 +3,8 @@ var jwt = require("jsonwebtoken"); // 使用jwt签名
 var config = require("../../../config"); // 使用jwt签名
 var ObjectID = require("mongodb").ObjectID;
 var user = async function(ctx, next) {
-  var id = ctx.params.id;
+  // var id = ctx.params.id;
+  let id = ctx.state.user.userid;
   let persons = await Person.find({
     createrId: id
   });

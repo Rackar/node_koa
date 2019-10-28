@@ -3,14 +3,15 @@ var User = require("../../../models/user");
 
 var ObjectID = require("mongodb").ObjectID;
 var user = async function(ctx, next) {
-  let id = ctx.params.id;
-  let user = await User.findOne({ _id: id });
+  // let id = ctx.params.id;
+  let id = ctx.state.user.userid;
+  let user = await User.findOne({_id: id});
   if (user) {
     let idArr = user.liking.map(sid => {
       return ObjectID(sid.personid);
     });
     let persons = await Person.find({
-      _id: { $in: idArr }
+      _id: {$in: idArr}
     });
     if (persons && persons.length) {
       ctx.body = {

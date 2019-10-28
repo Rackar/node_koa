@@ -36,6 +36,17 @@ var user = async function(ctx, next) {
     // }
   );
   if (person) {
+    await Person.updateOne(
+      {
+        _id: ObjectID(id)
+      },
+      {
+        $inc: {
+          "count.watched": 1
+        }
+      }
+    );
+
     ctx.body = {
       status: 1,
       msg: "拉取用户成功",

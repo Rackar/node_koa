@@ -16,6 +16,7 @@ var signup = async function(ctx, next) {
     photo: [],
     liked: [],
     count: {
+      watched: 1,
       followed: 1,
       following: 1,
       like: 1,
@@ -56,7 +57,7 @@ var signup = async function(ctx, next) {
   if (result)
     ctx.body = {
       msg: "新增人物成功",
-      data: { id: result.id },
+      data: {id: result.id},
       status: 1
     };
   else {
