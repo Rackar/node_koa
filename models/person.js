@@ -54,9 +54,10 @@ var PersonSchema = new Schema(
       like: Number,
       liked: Number,
       articles: Number,
-      words: Number
+      words: Number,
+      searched: Number
     }
   },
-  {timestamps: true}
+  { timestamps: true }
 );
 module.exports = mongoose.model("Person", PersonSchema);
