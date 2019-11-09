@@ -21,6 +21,7 @@ var UserSchema = new Schema({
   followed: [],
   liking: [],
   info: "",
+  starsLogs: [],
   avatar: {
     type: String
   },

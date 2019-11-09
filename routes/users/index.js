@@ -4,8 +4,8 @@ const jwt = require("jsonwebtoken");
 const config = require("../../config");
 
 router.post("/login", async function(ctx, next) {
-  let { mobile, pwd } = ctx.request.body;
-  let result = await User.findOne({ mobile, pwd });
+  let {mobile, pwd} = ctx.request.body;
+  let result = await User.findOne({mobile, pwd});
 
   if (result) {
     let token = jwt.sign(
@@ -42,8 +42,8 @@ router.post("/login", async function(ctx, next) {
 });
 
 router.post("/signup", async function(ctx, next) {
-  let { username, pwd, mobile } = ctx.request.body;
-  let existUser = await User.find({ mobile });
+  let {username, pwd, mobile} = ctx.request.body;
+  let existUser = await User.find({mobile});
   if (existUser.length !== 0) {
     ctx.response.status = 401;
     ctx.body = {
