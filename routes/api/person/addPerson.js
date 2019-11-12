@@ -8,9 +8,7 @@ var signup = async function(ctx, next) {
     birthday: body.birthday,
     deathday: body.deathday,
     info: body.info,
-    avatarfilePath: body.avatarfilePath
-      ? body.avatarfilePath
-      : "default/person.png",
+    avatarfilePath: body.avatarfilePath ? body.avatarfilePath : "person.png",
     createrId: body.createrId,
     articles: [],
     photo: [],
@@ -57,7 +55,7 @@ var signup = async function(ctx, next) {
   if (result)
     ctx.body = {
       msg: "新增人物成功",
-      data: {id: result.id},
+      data: { id: result.id },
       status: 1
     };
   else {

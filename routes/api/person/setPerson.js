@@ -16,9 +16,7 @@ var signup = async function(ctx, next) {
         birthday: body.birthday,
         deathday: body.deathday,
         info: body.info,
-        avatarfilePath: body.avatarfilePath
-          ? body.avatarfilePath
-          : "default/person.png"
+        avatarfilePath: body.avatarfilePath ? body.avatarfilePath : "person.png"
       }
     );
     if (updataPerson)
