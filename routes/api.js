@@ -2,7 +2,7 @@ const multer = require("koa-multer");
 
 const router = require("koa-router")();
 const person = require("./api/person/index");
-const star = require("./api/person/star");
+const star = require("./api/star/index");
 const Article = require("../models/article");
 router.prefix("/api");
 
@@ -15,7 +15,7 @@ var storage = multer.diskStorage({
     cb(null, file.fieldname + "-" + Date.now() + file.originalname);
   }
 });
-const upload = multer({storage: storage});
+const upload = multer({ storage: storage });
 
 router.post("/image", upload.single("avatar"));
 // router.post("/article", async function(ctx, next) {
