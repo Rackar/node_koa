@@ -28,7 +28,7 @@ var add = async function(ctx, next) {
 var total = async function(ctx, next) {
   // let id = ctx.params.id;
   let id = ctx.state.user.userid;
-  let user = await User.findOne({_id: id});
+  let user = await User.findOne({ _id: id });
   if (user) {
     let arr = user.starsLogs;
     var sum = arr.reduce((prev, next, index, array) => prev + next);
@@ -42,3 +42,4 @@ var total = async function(ctx, next) {
 
 router.post("/total", total);
 router.post("/add", add);
+module.exports = router;
