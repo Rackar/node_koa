@@ -5,6 +5,7 @@ var add = async function(ctx, next) {
   // res.send('respond with a resource');
   let addStarsNum = ctx.request.body.stars;
   let id = ctx.state.user.userid;
+  console.log("add Stars: " + addStarsNum);
   //   let user = await User.findOne({_id: id});
   let log = {
     stars: addStarsNum,
@@ -37,7 +38,7 @@ var total = async function(ctx, next) {
     let arr = user.starsLogs;
     var sum = arr.length
       ? arr.reduce((prev, next, index, array) => {
-          console.log(prev);
+          // console.log(prev);
           return { stars: prev.stars + next.stars };
         })
       : 0;
