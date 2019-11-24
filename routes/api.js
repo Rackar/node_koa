@@ -18,18 +18,6 @@ var storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 router.post("/image", upload.single("avatar"));
-// router.post("/article", async function(ctx, next) {
-//   let body = ctx.request.body;
-//   var article = await new Article({
-//     content: ctx.request.body.content,
-//     title: ctx.request.body.title
-//   });
-//   article.save();
-
-//   ctx.body = {
-//     msg: "新增成功"
-//   };
-// });
 
 router.use(person.routes(), person.allowedMethods()); // /person
 router.use(star.routes(), star.allowedMethods()); // /stars
