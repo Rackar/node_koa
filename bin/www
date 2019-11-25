@@ -14,7 +14,7 @@ var fs = require("fs");
 let args = process.argv.splice(2);
 console.log("启动参数可选-dev,当前参数：" + args);
 global.production = args.findIndex(obj => obj == "-dev") == -1;
-
+console.log(global.production);
 if (global.production) {
   //同步读取密钥和签名证书(https)
   var options = {
@@ -26,31 +26,32 @@ if (global.production) {
   var httpsServer = https.createServer(options, app.callback());
 
   httpsServer.listen(3007);
+  console.log("HTTPS Server start listening on: 3007");
   httpsServer.on("error", onError);
   httpsServer.on("listening", onListening);
+} else {
+  /**
+   * Get port from environment and store in Express.
+   */
+
+  var port = normalizePort(process.env.PORT || "3006");
+  // app.set('port', port);
+
+  /**
+   * Create HTTP server.
+   */
+
+  var server = http.createServer(app.callback());
+
+  /**
+   * Listen on provided port, on all network interfaces.
+   */
+
+  server.listen(port);
+  console.log("Server start listening on: " + port);
+  server.on("error", onError);
+  server.on("listening", onListening);
 }
-
-/**
- * Get port from environment and store in Express.
- */
-
-var port = normalizePort(process.env.PORT || "3006");
-// app.set('port', port);
-
-/**
- * Create HTTP server.
- */
-
-var server = http.createServer(app.callback());
-
-/**
- * Listen on provided port, on all network interfaces.
- */
-
-server.listen(port);
-console.log("Server start listening on: " + port);
-server.on("error", onError);
-server.on("listening", onListening);
 
 /**
  * Normalize a port into a number, string, or false.
