@@ -4,6 +4,7 @@ var addPingwei = require("./addPingwei");
 var addcansai = require("./addCansai");
 var addhuanjie = require("./addHuanjie");
 var getAll = require("./getAll");
+var del = require("./delete");
 // var getPopular = require("./getPopular");
 // var getNewest = require("./getNewest");
 // var user = require("./getPersonsByUser");
@@ -13,6 +14,7 @@ var getAll = require("./getAll");
 
 router.prefix("/pingfen");
 router.get("/all", getAll);
+router.post("/delete", del);
 router.post("/addpingwei", addPingwei);
 router.post("/addcansai", addcansai);
 router.post("/addhuanjie", addhuanjie);
