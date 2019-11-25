@@ -34,15 +34,6 @@ if (global.production) {
    * Get port from environment and store in Express.
    */
 
-  var port = normalizePort(process.env.PORT || "3006");
-  // app.set('port', port);
-
-  /**
-   * Create HTTP server.
-   */
-
-  var server = http.createServer(app.callback());
-
   /**
    * Listen on provided port, on all network interfaces.
    */
@@ -52,7 +43,14 @@ if (global.production) {
   server.on("error", onError);
   server.on("listening", onListening);
 }
+var port = normalizePort(process.env.PORT || "3006");
+// app.set('port', port);
 
+/**
+ * Create HTTP server.
+ */
+
+var server = http.createServer(app.callback());
 /**
  * Normalize a port into a number, string, or false.
  */
@@ -103,7 +101,7 @@ function onError(error) {
  * Event listener for HTTP server "listening" event.
  */
 
-function onListening() {
+function onListening(server) {
   var addr = server.address();
   var bind = typeof addr === "string" ? "pipe " + addr : "port " + addr.port;
   debug("Listening on " + bind);
