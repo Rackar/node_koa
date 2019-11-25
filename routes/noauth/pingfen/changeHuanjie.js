@@ -3,9 +3,14 @@ var ObjectID = require("mongodb").ObjectID;
 var signup = async function(ctx, next) {
   var body = ctx.request.body;
   // var newid = new ObjectID()
-  let _id = ObjectID("5ddb90b8d6f343e724488221");
+
   let { cansaiId, huanjieId } = body;
 
+  let first = await flow.findOne({});
+  let _id = new ObjectID();
+  if (first)
+    // let _id = ObjectID("5ddb90b8d6f343e724488221");
+    _id = first._id;
   // // let fl = new flow(obj);
   // // let result = await fl.save();
   let result = await flow.updateOne(
@@ -15,7 +20,8 @@ var signup = async function(ctx, next) {
         cansaiId: cansaiId,
         huanjieId: huanjieId
       }
-    }
+    },
+    { upsert: true }
   );
 
   // let fl = new flow({

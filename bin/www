@@ -11,11 +11,11 @@ var http = require("http");
 var https = require("https");
 var fs = require("fs");
 
-let args = process.argv.splice(2);
-console.log("启动参数可选-dev,当前参数：" + args);
-global.production = args.findIndex(obj => obj == "-dev") == -1;
-console.log(global.production);
-if (global.production) {
+// let args = process.argv.splice(2);
+// console.log("启动参数可选-dev,当前参数：" + args);
+// global.production = args.findIndex(obj => obj == "-dev") == -1;
+// console.log(global.production);
+if (process.env.NODE_ENV === "production") {
   //同步读取密钥和签名证书(https)
   var options = {
     // key: fs.readFileSync("./key/2910531_talatan.com.key"),
