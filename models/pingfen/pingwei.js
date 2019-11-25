@@ -10,12 +10,12 @@ var PingweiSchema = new Schema(
     },
     username: { type: String },
     password: { type: String },
-    articles: [
+    record: [
       {
         _id: Schema.Types.ObjectId,
-        title: String,
-        text: String,
-        createrid: String
+        huanjieId: String,
+        cansaiId: String,
+        fenshu: Number
       }
     ],
 

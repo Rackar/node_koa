@@ -3,15 +3,15 @@ var Schema = mongoose.Schema;
 // var List =  require("./list");
 // var Image =require('./image.js');
 
-var HuanjieSchema = new Schema(
+var FlowSchema = new Schema(
   {
-    name: {
+    cansaiId: {
       type: String
     },
-    active: {
-      type: Boolean
+    huanjieId: {
+      type: String
     }
   },
   { timestamps: true }
 );
-module.exports = mongoose.model("Huanjie", HuanjieSchema);
+module.exports = mongoose.model("Flow", FlowSchema);
