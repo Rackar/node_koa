@@ -5,8 +5,8 @@ var signup = async function(ctx, next) {
   var regperson = new Pingwei({
     // _id: newid,
     name: body.name,
-    birthday: body.username,
-    deathday: body.password,
+    username: body.username,
+    password: body.password,
     avatar: body.avatar ? body.avatar : "person.png"
   });
 
