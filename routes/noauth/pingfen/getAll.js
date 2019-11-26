@@ -5,7 +5,6 @@ var Flow = require("../../../models/pingfen/flow");
 var Record = require("../../../models/pingfen/record");
 var ObjectID = require("mongodb").ObjectID;
 var user = async function(ctx, next) {
-  var body = ctx.request.body;
   let cs = await cansai.find();
   let hj = await huanjie.find();
   let pw = await pingwei.find();
