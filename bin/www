@@ -10,11 +10,24 @@ var http = require("http");
 
 var https = require("https");
 var fs = require("fs");
+const socket = require("socket.io");
+const websocket = require("../webSocket/index");
+let io = null;
 
 // let args = process.argv.splice(2);
 // console.log("启动参数可选-dev,当前参数：" + args);
 // global.production = args.findIndex(obj => obj == "-dev") == -1;
 // console.log(global.production);
+
+var port = normalizePort(process.env.PORT || "3006");
+// app.set('port', port);
+
+/**
+ * Create HTTP server.
+ */
+
+var server = http.createServer(app.callback());
+
 if (process.env.NODE_ENV === "production") {
   //同步读取密钥和签名证书(https)
   var options = {
@@ -24,21 +37,17 @@ if (process.env.NODE_ENV === "production") {
     cert: fs.readFileSync("/etc/nginx/2910531_talatan.com.pem")
   };
   var httpsServer = https.createServer(options, app.callback());
+  io = socket(httpsServer);
 
   httpsServer.listen(3007);
   console.log("HTTPS Server start listening on: 3007");
   httpsServer.on("error", onError);
   httpsServer.on("listening", onListening);
 } else {
+  io = socket(server);
 }
-var port = normalizePort(process.env.PORT || "3006");
-// app.set('port', port);
 
-/**
- * Create HTTP server.
- */
-
-var server = http.createServer(app.callback());
+io.on("connection", websocket);
 /**
  * Normalize a port into a number, string, or false.
  */
