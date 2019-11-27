@@ -27,7 +27,7 @@ var signup = async function(ctx, next) {
     name: body.name,
     username: body.username,
     password: body.password,
-    avatar: body.avatar ? body.avatar : ctx.origin + "/person.png"
+    avatar: body.avatar ? body.avatar : "person.png"
   });
 
   let result = await regperson.save();
