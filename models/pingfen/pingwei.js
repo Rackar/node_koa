@@ -10,6 +10,7 @@ var PingweiSchema = new Schema(
     },
     username: { type: String },
     password: { type: String },
+    pwtype: { type: String },
     record: [
       {
         _id: Schema.Types.ObjectId,

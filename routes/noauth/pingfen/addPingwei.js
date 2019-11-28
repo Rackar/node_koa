@@ -27,6 +27,7 @@ var signup = async function(ctx, next) {
     name: body.name,
     username: body.username,
     password: body.password,
+    pwtype: body.pwtype,
     avatar: body.avatar ? body.avatar : "person.png"
   });
 
