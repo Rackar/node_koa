@@ -4,7 +4,7 @@ var signup = async function(ctx, next) {
   var body = ctx.request.body;
   // var newid = new ObjectID()
 
-  let { cansaiId, huanjieId } = body;
+  let { cansaiId, huanjieId,zhuban,title } = body;
 
   let first = await flow.findOne({});
   let _id = new ObjectID();
@@ -18,7 +18,7 @@ var signup = async function(ctx, next) {
     {
       $set: {
         cansaiId: cansaiId,
-        huanjieId: huanjieId
+        huanjieId: huanjieId,zhuban,title
       }
     },
     { upsert: true }
