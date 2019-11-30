@@ -3,6 +3,7 @@ var huanjie = require("../../../models/pingfen/huanjie");
 var pingwei = require("../../../models/pingfen/pingwei");
 var Flow = require("../../../models/pingfen/flow");
 var Record = require("../../../models/pingfen/record");
+var Bisai = require("../../../models/pingfen/bisai");
 var ObjectID = require("mongodb").ObjectID;
 var user = async function(ctx, next) {
   let cs = await cansai.find();
@@ -10,11 +11,12 @@ var user = async function(ctx, next) {
   let pw = await pingwei.find();
   let flow = await Flow.find();
   let record = await Record.find();
+  let bisai = await Bisai.find();
   if (true) {
     ctx.body = {
       status: 1,
       msg: "获取点击最多人物列表成功",
-      data: { cs, hj, pw, flow, record }
+      data: { cs, hj, pw, flow, record, bisai }
     };
   }
 };

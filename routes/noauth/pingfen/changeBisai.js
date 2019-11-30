@@ -1,24 +1,24 @@
-var flow = require("../../../models/pingfen/flow");
+var Bisai = require("../../../models/pingfen/bisai");
 var ObjectID = require("mongodb").ObjectID;
 var signup = async function(ctx, next) {
   var body = ctx.request.body;
   // var newid = new ObjectID()
 
-  let { cansaiId, huanjieId } = body;
+  let { zhuban, title } = body;
 
-  let first = await flow.findOne({});
+  let first = await Bisai.findOne({});
   let _id = new ObjectID();
   if (first)
     // let _id = ObjectID("5ddb90b8d6f343e724488221");
     _id = first._id;
   // // let fl = new flow(obj);
   // // let result = await fl.save();
-  let result = await flow.updateOne(
+  let result = await Bisai.updateOne(
     { _id: _id },
     {
       $set: {
-        cansaiId: cansaiId,
-        huanjieId: huanjieId
+        zhuban: zhuban,
+        title: title
       }
     },
     { upsert: true }
@@ -32,7 +32,7 @@ var signup = async function(ctx, next) {
   // let result = await fl.save();
   if (result)
     ctx.body = {
-      msg: "环节变更成功",
+      msg: "比赛变更成功",
       data: result,
       status: 1
     };

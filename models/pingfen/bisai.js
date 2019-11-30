@@ -3,15 +3,15 @@ var Schema = mongoose.Schema;
 // var List =  require("./list");
 // var Image =require('./image.js');
 
-var FlowSchema = new Schema(
+var BisaiSchema = new Schema(
   {
-    cansaiId: {
+    title: {
       type: String
     },
-    huanjieId: {
+    zhuban: {
       type: String
     }
   },
   { timestamps: true }
 );
-module.exports = mongoose.model("Flow", FlowSchema);
+module.exports = mongoose.model("Bisai", BisaiSchema);

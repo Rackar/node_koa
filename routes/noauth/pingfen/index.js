@@ -6,6 +6,7 @@ var addhuanjie = require("./addHuanjie");
 var getAll = require("./getAll");
 var del = require("./delete");
 var changeHuanjie = require("./changeHuanjie");
+var changebisai = require("./changeBisai");
 var add = require("./dafen");
 var login = require("./login");
 
@@ -18,6 +19,7 @@ router.post("/addpingwei", addPingwei); //新增评委
 router.post("/addcansai", addcansai); //新增队伍
 router.post("/addhuanjie", addhuanjie); //新增比赛环节
 router.post("/changehuanjie", changeHuanjie); //设定当前为哪个环节和队伍评分
+router.post("/changebisai", changebisai); //设定当前为哪个环节和队伍评分
 router.post("/add", add); //评委打分
 router.post("/login", login); //评委登录
 
