@@ -10,6 +10,12 @@ var FlowSchema = new Schema(
     },
     huanjieId: {
       type: String
+    },
+    title: {
+      type: String
+    },
+    zhuban: {
+      type: String
     }
   },
   { timestamps: true }
