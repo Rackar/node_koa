@@ -25,6 +25,7 @@ var signup = async function(ctx, next) {
   var regperson = new Pingwei({
     // _id: newid,
     name: body.name,
+    description: body.description,
     username: body.username,
     password: body.password,
     pwtype: body.pwtype,

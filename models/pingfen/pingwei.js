@@ -8,6 +8,9 @@ var PingweiSchema = new Schema(
     name: {
       type: String
     },
+    description: {
+      type: String
+    },
     username: { type: String },
     password: { type: String },
     pwtype: { type: String },
