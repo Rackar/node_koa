@@ -2,7 +2,8 @@ var mongoose = require("../api/db_mongoose");
 var Schema = mongoose.Schema;
 
 var GPSSchema = new Schema({
-  // userid: String,
+  userid: String,
+  title:String,
   // routeName: String,
   // routeTime: String,
   tripId: String,
@@ -16,6 +17,8 @@ var GPSSchema = new Schema({
   heading: String,
   speed: String,
   accuracy: String,
-  coordsType: String
-});
+  coordsType: String,
+  other:Object
+},
+{ timestamps: true });
 module.exports = mongoose.model("GPS", GPSSchema);
