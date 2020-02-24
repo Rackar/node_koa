@@ -25,7 +25,7 @@ var port = normalizePort(process.env.PORT || "3006");
 
 var server = http.createServer(app.callback());
 
-if (process.env.NODE_ENV === "production") {
+// if (process.env.NODE_ENV === "production") {
   //同步读取密钥和签名证书(https)
   var options = {
     // key: fs.readFileSync("./key/2910531_talatan.com.key"),
@@ -39,7 +39,7 @@ if (process.env.NODE_ENV === "production") {
   console.log("HTTPS Server start listening on: 3007");
   httpsServer.on("error", onError);
   httpsServer.on("listening", onListening);
-} 
+// } 
 
 /**
  * Normalize a port into a number, string, or false.
