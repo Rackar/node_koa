@@ -83,7 +83,7 @@ app.use(async (ctx, next) => {
 
 app.use(
   jwt({ secret: config.jwtsecret }).unless({
-    path: [/^\/noauth/]
+    path: [/^\/noauth/, /^\/api\/lianyue/]
     // path: [/^\/public/, /^\/uploads/, /^\/noauth/]
   })
 );

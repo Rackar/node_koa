@@ -3,15 +3,16 @@ const multer = require("koa-multer");
 const router = require("koa-router")();
 const person = require("./api/person/index");
 const star = require("./api/star/index");
+const lianyue = require("./noauth/lianyue/addArticle");
 const Article = require("../models/article");
 router.prefix("/api");
 
 var storage = multer.diskStorage({
-  destination: function(req, file, cb) {
+  destination: function (req, file, cb) {
     cb(null, "uploads/");
     // cb(null, 'public/uploads/')
   },
-  filename: function(req, file, cb) {
+  filename: function (req, file, cb) {
     cb(null, file.fieldname + "-" + Date.now() + file.originalname);
   }
 });
@@ -33,4 +34,5 @@ router.post("/image", upload.single("avatar"));
 
 router.use(person.routes(), person.allowedMethods()); // /person
 router.use(star.routes(), star.allowedMethods()); // /stars
+router.use(lianyue.routes(), lianyue.allowedMethods()); // /person
 module.exports = router;
