@@ -26,8 +26,6 @@ var addLink = async function (ctx, next) {
   let params = ctx.request.body;
 
   let url = params.url
-    .split(/\n/)
-    .filter(ele => ele !== "" && ele !== " ");
   let pass = params.pass;
   let gzlist = "ilianyue";
   let push = await axios.post("http://123.206.94.184:5000/add", { url, pass, gzlist });
