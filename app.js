@@ -7,10 +7,10 @@ const bodyparser = require("koa-bodyparser");
 const logger = require("koa-logger");
 
 const noauth = require("./routes/noAuth");
-const api = require("./routes/api");
+// const api = require("./routes/api");
 
-const jwt = require("koa-jwt");
-const config = require("./config/index");
+// const jwt = require("koa-jwt");
+// const config = require("./config/index");
 // error handler
 // onerror(app)
 
@@ -51,7 +51,7 @@ const handler = async (ctx, next) => {
       console.log("handler处理错误");
       ctx.response.status = err.statusCode || err.status || 500;
       ctx.response.body = {
-        message: err.message
+        message: err.message,
       };
     }
   }
@@ -60,7 +60,7 @@ const handler = async (ctx, next) => {
 // middlewares
 app.use(
   bodyparser({
-    enableTypes: ["json", "form", "text"]
+    enableTypes: ["json", "form", "text"],
   })
 );
 app.use(json());
@@ -78,19 +78,19 @@ app.use(async (ctx, next) => {
   const start = new Date();
   await next();
   const ms = new Date() - start;
-  console.log(`${ctx.method} ${ctx.url} - ${ms}ms`);
+  console.log(`${ctx.method} ${ctx.url} - ${ms}ms. ${start}`);
 });
 
-app.use(
-  jwt({ secret: config.jwtsecret }).unless({
-    path: [/^\/noauth/]
-    // path: [/^\/public/, /^\/uploads/, /^\/noauth/]
-  })
-);
+// app.use(
+//   jwt({ secret: config.jwtsecret }).unless({
+//     path: [/^\/noauth/],
+//     // path: [/^\/public/, /^\/uploads/, /^\/noauth/]
+//   })
+// );
 
 // routes
 app.use(noauth.routes(), noauth.allowedMethods());
-app.use(api.routes(), api.allowedMethods());
+// app.use(api.routes(), api.allowedMethods());
 
 // // error-handling
 // app.on('error', (err, ctx) => {

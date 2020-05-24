@@ -1,9 +1,9 @@
 const router = require("koa-router")();
 
-const users = require("./users/index");
+// const users = require("./users/index");
 const upload = require("./upload");
 
-const pingfen = require("./noauth/pingfen/index");
+// const pingfen = require("./noauth/pingfen/index");
 router.prefix("/noauth");
 
 // router.get("/article", async function(ctx, next) {
@@ -19,7 +19,7 @@ router.prefix("/noauth");
 //   ctx.body = result;
 // });
 
-router.use(users.routes(), users.allowedMethods()); // /login  /signup
+// router.use(users.routes(), users.allowedMethods()); // /login  /signup
 router.use(upload.routes(), upload.allowedMethods()); // /upload
-router.use(pingfen.routes(), pingfen.allowedMethods()); // /person
+// router.use(pingfen.routes(), pingfen.allowedMethods()); // /person
 module.exports = router;

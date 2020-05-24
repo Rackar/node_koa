@@ -9,9 +9,9 @@ var debug = require("debug")("demo:server");
 var http = require("http");
 
 var fs = require("fs");
-const socket = require("socket.io");
-const websocket = require("../webSocket/index");
-let io = null;
+// const socket = require("socket.io");
+// const websocket = require("../webSocket/index");
+// let io = null;
 
 // let args = process.argv.splice(2);
 // console.log("启动参数可选-dev,当前参数：" + args);
@@ -27,12 +27,12 @@ var port = normalizePort(process.env.PORT || "3006");
 
 var server = http.createServer(app.callback());
 
-if (process.env.NODE_ENV === "production") {
-} else {
-  io = socket(server);
-}
+// if (process.env.NODE_ENV === "production") {
+// } else {
+//   io = socket(server);
+// }
 
-io.on("connection", websocket);
+// io.on("connection", websocket);
 /**
  * Normalize a port into a number, string, or false.
  */
