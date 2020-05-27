@@ -5,6 +5,7 @@ const json = require("koa-json");
 // const onerror = require('koa-onerror')
 const bodyparser = require("koa-bodyparser");
 const logger = require("koa-logger");
+const range = require("koa-range");
 
 const noauth = require("./routes/noAuth");
 // const api = require("./routes/api");
@@ -65,6 +66,7 @@ app.use(
 );
 app.use(json());
 app.use(logger());
+app.use(range);
 app.use(require("koa-static")(__dirname + "/uploads"));
 // app.use(
 //   views(__dirname + '/views', {
@@ -100,9 +102,9 @@ app.use(noauth.routes(), noauth.allowedMethods());
 
 app.on("error", (error) => {
   if (error.code === "EPIPE") {
-    logger.warn("Koa app-level EPIPE error.", { error });
+    console.warn("Koa app-level EPIPE error.", { error });
   } else {
-    logger.error("Koa app-level error", { error });
+    console.error("Koa app-level error", { error });
   }
 });
 
