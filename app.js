@@ -43,12 +43,12 @@ const handler = async (ctx, next) => {
   if (ctx.request.method == "OPTIONS") {
     ctx.response.status = 200;
   } else {
-    console.log(`Process ${ctx.request.method} ${ctx.request.url}`);
+    // console.log(`Process ${ctx.request.method} ${ctx.request.url}`);
     try {
       await next();
-      console.log("handler通过");
+      // console.log("handler通过");
     } catch (err) {
-      console.log("handler处理错误");
+      console.log("handler处理错误", err.message);
       ctx.response.status = err.statusCode || err.status || 500;
       ctx.response.body = {
         message: err.message,
@@ -76,9 +76,10 @@ app.use(handler);
 // logger
 app.use(async (ctx, next) => {
   const start = new Date();
+  console.log(`${start}`);
   await next();
-  const ms = new Date() - start;
-  console.log(`${ctx.method} ${ctx.url} - ${ms}ms. ${start}`);
+  // const ms = new Date()
+  // console.log(`${start}`);
 });
 
 // app.use(
@@ -96,5 +97,13 @@ app.use(noauth.routes(), noauth.allowedMethods());
 // app.on('error', (err, ctx) => {
 //   console.error('server error', err, ctx)
 // })
+
+app.on("error", (error) => {
+  if (error.code === "EPIPE") {
+    logger.warn("Koa app-level EPIPE error.", { error });
+  } else {
+    logger.error("Koa app-level error", { error });
+  }
+});
 
 module.exports = app;
