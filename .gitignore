@@ -1,6 +1,8 @@
 node_modules/
 # .vscode/
 public/
-uploads/
+/uploads/*
 key/
 secret.js
+!index.html
+!default.png
