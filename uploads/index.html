@@ -9,6 +9,9 @@
   <body>
     <div class="tip">点击右上角 ... 按钮可分享到微信和朋友圈 ↑</div>
     <img id="pic" src="default.png" alt="" />
+    <video id="video" controls="controls">
+      您的浏览器不支持 video 标签。
+    </video>
     <div class="btn"><a id="save">保存图片</a></div>
 
     <!-- <div class="btn" id="share">分享给微信好友</div>
@@ -56,11 +59,17 @@
       if (url && url.length > 3) {
         let extName = url.substr(-3, 3);
         if (extName === "jpg" || extName === "png") {
+          document.getElementById("pic").style.display = "block";
+          document.getElementById("video").style.display = "none";
+
           document.getElementById("pic").src = url;
-          document.getElementById("save").href = url;
-          document.getElementById("save").download = "下载";
         } else if (extName === "mp4") {
+          document.getElementById("pic").style.display = "none";
+          document.getElementById("video").style.display = "block";
+          document.getElementById("video").src = url;
         }
+        document.getElementById("save").href = url;
+        document.getElementById("save").download = "下载";
       }
       //   function share() {}
       //   function friendZone() {}
@@ -105,12 +114,43 @@
         text-align: center;
         border: 1px solid rgb(131, 228, 228);
         border-radius: 12px;
-        margin: 4px auto;
+        margin: 8px auto;
         padding: 4px 20px;
         width: 70px;
       }
       .tip {
         text-align: right;
+        padding: 5px;
+      }
+
+      #video {
+        display: none;
+        max-width: 100%;
+        max-height: 90%;
+      }
+      a {
+        text-decoration: none;
+        color: black;
+        -webkit-tap-highlight-color: rgba(255, 255, 255, 0);
+        -webkit-user-select: none;
+        -moz-user-focus: none;
+        -moz-user-select: none;
+      }
+      a:link {
+        text-decoration: none;
+        color: black;
+      }
+      a:visited {
+        text-decoration: none;
+        color: black;
+      }
+      a:hover {
+        text-decoration: none;
+        color: black;
+      }
+      a:active {
+        text-decoration: none;
+        color: black;
       }
     </style>
   </body>
