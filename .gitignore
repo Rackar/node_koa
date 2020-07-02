@@ -6,3 +6,4 @@ key/
 secret.js
 !index.html
 !default.png
+!index.js

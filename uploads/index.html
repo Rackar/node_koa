@@ -16,10 +16,16 @@
 
     <!-- <div class="btn" id="share">分享给微信好友</div>
     <div class="btn" id="friendZone">分享到朋友圈</div> -->
+    <script src="./index.js"></script>
     <script>
       //   let thisPath = window.location.herf;
       let origin = window.location.origin; //http://127.0.0.1:5500
       let tokenUrl = origin + "/cam/noauth/upload/token";
+      //   let { shareTitle, shareDesc, shareImageUrl } = require("./index.js");
+      console.log(config);
+      //   let shareTitle ="照片"
+      //   let shareDesc = ""
+      //   let shareImageUrl=""
       fetch(tokenUrl)
         .then((response) => response.json())
         .then((data) => {
@@ -31,7 +37,7 @@
         });
       function initWxSetting(data) {
         wx.config({
-          debug: true, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
+          //   debug: true, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
           appId: "wxe89c1d073894be3d", // 必填，公众号的唯一标识
           timestamp: data.timestamp, // 必填，生成签名的时间戳
           nonceStr: data.noncestr, // 必填，生成签名的随机串
@@ -51,10 +57,10 @@
           console.log();
           if (wx.updateAppMessageShareData) {
             wx.updateAppMessageShareData({
-              title: "照片", // 分享标题
-              desc: "我拍了照片", // 分享描述
+              title: config.shareTitle, // 分享标题
+              desc: config.shareDesc, // 分享描述
               link: data.url, // 分享链接，该链接域名或路径必须与当前页面对应的公众号JS安全域名一致
-              imgUrl: "https://www.codingyang.com/logo.png", // 分享图标
+              imgUrl: config.shareImageUrl, // 分享图标
               success: function () {
                 // 设置成功
                 console.log("设置成功");
@@ -62,10 +68,10 @@
             });
           } else {
             wx.onMenuShareAppMessage({
-              title: "照片", // 分享标题
-              desc: "我拍了照片", // 分享描述
+              title: config.shareTitle, // 分享标题
+              desc: config.shareDesc, // 分享描述
               link: data.url, // 分享链接，该链接域名或路径必须与当前页面对应的公众号JS安全域名一致
-              imgUrl: "https://www.codingyang.com/logo.png", // 分享图标
+              imgUrl: config.shareImageUrl, // 分享图标
               type: "", // 分享类型,music、video或link，不填默认为link
               dataUrl: "", // 如果type是music或video，则要提供数据链接，默认为空
               success: function () {
@@ -75,9 +81,9 @@
           }
           //需在用户可能点击分享按钮前就先调用
           wx.updateTimelineShareData({
-            title: "照片", // 分享标题
+            title: config.shareTitle, // 分享标题
             link: data.url, // 分享链接，该链接域名或路径必须与当前页面对应的公众号JS安全域名一致
-            imgUrl: "https://www.codingyang.com/logo.png", // 分享图标
+            imgUrl: config.shareImageUrl, // 分享图标
             success: function () {
               // 设置成功
               console.log("设置又成功");
