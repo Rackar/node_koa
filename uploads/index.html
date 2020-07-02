@@ -8,17 +8,17 @@
   </head>
   <body>
     <div class="tip">点击右上角 ... 按钮可分享到微信和朋友圈 ↑</div>
+    <div class="btn"><a id="save">下载图片</a></div>
     <img id="pic" src="default.png" alt="" />
     <video id="video" controls="controls">
       您的浏览器不支持 video 标签。
     </video>
-    <div class="btn"><a id="save">保存图片</a></div>
 
     <!-- <div class="btn" id="share">分享给微信好友</div>
     <div class="btn" id="friendZone">分享到朋友圈</div> -->
     <script>
       let origin = window.location.origin; //http://127.0.0.1:5500
-      let tokenUrl = origin + "/noauth/upload/token";
+      let tokenUrl = origin + "/cam/noauth/upload/token";
       fetch(tokenUrl)
         .then((response) => response.json())
         .then((data) => {
