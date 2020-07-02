@@ -7,8 +7,11 @@
     <script src="http://res.wx.qq.com/open/js/jweixin-1.6.0.js"></script>
   </head>
   <body>
-    <div class="tip">点击右上角 ... 按钮可分享到微信和朋友圈 ↑</div>
-    <div class="btn"><a id="save">下载图片</a></div>
+    <div class="tip">
+      长按图片保存到手机
+      <!-- 点击右上角 ... 按钮可分享到微信和朋友圈 ↑ -->
+    </div>
+    <!-- <div class="btn"><a id="save">下载图片</a></div> -->
     <img id="pic" src="default.png" alt="" />
     <video id="video" controls="controls">
       您的浏览器不支持 video 标签。
@@ -117,8 +120,8 @@
           document.getElementById("video").style.display = "block";
           document.getElementById("video").src = url;
         }
-        document.getElementById("save").href = url;
-        document.getElementById("save").download = "下载";
+        // document.getElementById("save").href = url;
+        // document.getElementById("save").download = "下载";
       }
       //   function share() {}
       //   function friendZone() {}
@@ -144,7 +147,7 @@
         width: 70px;
       }
       .tip {
-        text-align: right;
+        text-align: center;
         padding: 5px;
       }
 
