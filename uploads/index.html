@@ -26,6 +26,10 @@
       let tokenUrl = origin + "/cam/noauth/upload/token"; //nginx下cam才管用，否则修改为3006
       //   let { shareTitle, shareDesc, shareImageUrl } = require("./index.js");
       console.log(config);
+      let shareTitle = GetQueryString("shareTitle");
+      let shareDesc = GetQueryString("shareDesc");
+      let shareImageUrl = GetQueryString("shareImageUrl");
+      console.log(shareTitle);
       //   let shareTitle ="照片"
       //   let shareDesc = ""
       //   let shareImageUrl=""
@@ -104,7 +108,7 @@
       function GetQueryString(name) {
         var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
         var r = window.location.search.substr(1).match(reg);
-        if (r != null) return unescape(r[2]);
+        if (r != null) return decodeURIComponent(r[2]);
         return null;
       }
 

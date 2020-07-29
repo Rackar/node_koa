@@ -46,11 +46,11 @@ router.post("/image", upload.single("file"), function (ctx, next) {
   if (ctx.request.query.project) folder = ctx.request.query.project + "/";
   let params = "";
   if (ctx.request.query.shareTitle)
-    params += "&shareTitle=" + ctx.request.query.shareTitle;
+    params += "&shareTitle=" + encodeURI(ctx.request.query.shareTitle);
   if (ctx.request.query.shareDesc)
-    params += "&shareDesc=" + ctx.request.query.shareDesc;
+    params += "&shareDesc=" + encodeURI(ctx.request.query.shareDesc);
   if (ctx.request.query.shareImageUrl)
-    params += "&shareImageUrl=" + ctx.request.query.shareImageUrl;
+    params += "&shareImageUrl=" + encodeURI(ctx.request.query.shareImageUrl);
   let data = {
     path: ctx.req.file.path,
     // filename: ctx.req.file.filename, //只传递图片地址
