@@ -15,7 +15,15 @@ const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     // cb(null, "/root/myapp/node_koa/uploads/");
     let folder = "uploads/";
-    let project = req.url.split("=")[1] || "";
+    let params = req._parsedUrl.query || "";
+    let arr = params.split("&");
+    let query = {};
+    for (const param of arr) {
+      let key = param.split("=")[0];
+      let value = param.split("=")[1];
+      query[key] = value;
+    }
+    let project = query.project || "";
     project = decodeURI(project);
     if (project) {
       folder += project;
@@ -35,11 +43,18 @@ const upload = multer({ storage: storage });
 // })
 router.post("/image", upload.single("file"), function (ctx, next) {
   let folder = "";
-  if (ctx.request.query.project) folder += ctx.request.query.project + "/";
+  if (ctx.request.query.project) folder = ctx.request.query.project + "/";
+  let params = "";
+  if (ctx.request.query.shareTitle)
+    params += "&shareTitle=" + ctx.request.query.shareTitle;
+  if (ctx.request.query.shareDesc)
+    params += "&shareDesc=" + ctx.request.query.shareDesc;
+  if (ctx.request.query.shareImageUrl)
+    params += "&shareImageUrl=" + ctx.request.query.shareImageUrl;
   let data = {
     path: ctx.req.file.path,
     // filename: ctx.req.file.filename, //只传递图片地址
-    filename: "index.html?img=" + folder + ctx.req.file.filename, //传递网页地址
+    filename: "index.html?img=" + folder + ctx.req.file.filename + params, //传递网页地址
     contentType: ctx.req.file.mimetype,
   };
   console.log(data);

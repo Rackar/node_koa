@@ -57,13 +57,15 @@
         });
         wx.ready(function () {
           console.log("jssdk初始化成功");
-          console.log();
+          let shareTitle = GetQueryString("shareTitle");
+          let shareDesc = GetQueryString("shareDesc");
+          let shareImageUrl = GetQueryString("shareImageUrl");
           if (wx.updateAppMessageShareData) {
             wx.updateAppMessageShareData({
-              title: config.shareTitle, // 分享标题
-              desc: config.shareDesc, // 分享描述
+              title: shareTitle || config.shareTitle, // 分享标题
+              desc: shareDesc || config.shareDesc, // 分享描述
               link: data.url, // 分享链接，该链接域名或路径必须与当前页面对应的公众号JS安全域名一致
-              imgUrl: config.shareImageUrl, // 分享图标
+              imgUrl: shareImageUrl || config.shareImageUrl, // 分享图标
               success: function () {
                 // 设置成功
                 console.log("设置成功");
