@@ -1,5 +1,6 @@
 const router = require("koa-router")();
 const multer = require("koa-multer");
+const fs = require("fs");
 let request = require("request");
 let { APPID, APPSECRET } = require("./secret.js");
 router.prefix("/upload");
@@ -13,7 +14,16 @@ let cacheInfo = {
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     // cb(null, "/root/myapp/node_koa/uploads/");
-    cb(null, "uploads/");
+    let folder = "uploads/";
+    let project = req.url.split("=")[1] || "";
+    project = decodeURI(project);
+    if (project) {
+      folder += project;
+      if (!fs.existsSync(folder)) {
+        fs.mkdirSync(folder);
+      }
+    }
+    cb(null, folder);
   },
   filename: function (req, file, cb) {
     cb(null, file.fieldname + "-" + Date.now() + "-" + file.originalname);
@@ -24,13 +34,15 @@ const upload = multer({ storage: storage });
 //   ctx.body = "上传成功"
 // })
 router.post("/image", upload.single("file"), function (ctx, next) {
+  let folder = "";
+  if (ctx.request.query.project) folder += ctx.request.query.project + "/";
   let data = {
     path: ctx.req.file.path,
     // filename: ctx.req.file.filename, //只传递图片地址
-    filename: "index.html?img=" + ctx.req.file.filename, //传递网页地址
+    filename: "index.html?img=" + folder + ctx.req.file.filename, //传递网页地址
     contentType: ctx.req.file.mimetype,
   };
-
+  console.log(data);
   ctx.body = {
     status: 1,
     msg: "上传图片成功",
