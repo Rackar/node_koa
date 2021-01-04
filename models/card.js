@@ -6,19 +6,24 @@ var CardSchema = new Schema({
     type: String,
   },
   money: {
-    type: String,
+    type: Number,
   },
   hangye: {
     type: String,
   },
   endDate: {
-    type: String,
+    type: Date,
   },
   startDate: {
-    type: String,
+    type: Date,
   },
+  log:[{
+    changedMoney:Number,
+    changeDate: Number
+    }],
   userid: {
     type: String,
   },
-});
+},
+{ timestamps: true });
 module.exports = mongoose.model("Card", CardSchema);
