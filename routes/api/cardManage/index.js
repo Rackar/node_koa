@@ -22,6 +22,7 @@ var change = async function (ctx, next) {
   // res.send('respond with a resource');
   let changedCard = ctx.request.body.card;
   let id = ctx.state.user.userid;
+  let detail=changedCard.changeMoney
   console.log("change card: " + changedCard.changeMoney);
   // addCard.userid===id
 
@@ -38,7 +39,7 @@ var change = async function (ctx, next) {
         $addToSet: {
           log: [
             {
-              changeMoney: changedCard.changeMoney,
+              detail: detail,
               changeDate: Date.now(),
             },
           ],

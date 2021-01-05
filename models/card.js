@@ -20,7 +20,7 @@ var CardSchema = new Schema(
     },
     log: [
       {
-        changedMoney: String,
+        detail: Number,
         changeDate: Number,
       },
     ],
