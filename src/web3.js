@@ -1,9 +1,12 @@
 const Web3 = require('web3');
 const WrapEvents = require("../models/WrapEvents");
+const BuyEvents = require("../models/BuyEvents");
 
-let web3 ;
+let web3;
 
-let address = "0x4667fbC2C61fb2370F8314b356924E01Fe2e1A6e" //0311 kovan添加event
+const myAddress = "0x65D17D3dC59b5ce3d4CE010eB1719882b3f10490"
+
+let address = "0xD49091863732A03901e46074127Fd04e15080572" //0312 kovan添加event
 let ABI = [
     {
         "inputs": [],
@@ -48,6 +51,12 @@ let ABI = [
                 "indexed": true,
                 "internalType": "uint256",
                 "name": "NFTid",
+                "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "dNFTid",
                 "type": "uint256"
             },
             {
@@ -171,6 +180,50 @@ let ABI = [
         ],
         "name": "URI",
         "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "internalType": "address",
+                "name": "Buyer",
+                "type": "address"
+            },
+            {
+                "indexed": true,
+                "internalType": "uint256",
+                "name": "dNFTid",
+                "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "amount",
+                "type": "uint256"
+            }
+        ],
+        "name": "dNFTbought",
+        "type": "event"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "name": "artistWhiteList",
+        "outputs": [
+            {
+                "internalType": "bool",
+                "name": "",
+                "type": "bool"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
     },
     {
         "inputs": [
@@ -378,6 +431,19 @@ let ABI = [
     },
     {
         "inputs": [],
+        "name": "officialFunds",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
         "name": "owner",
         "outputs": [
             {
@@ -489,6 +555,24 @@ let ABI = [
             }
         ],
         "name": "setApprovalForAll",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "artist",
+                "type": "address"
+            },
+            {
+                "internalType": "bool",
+                "name": "permission",
+                "type": "bool"
+            }
+        ],
+        "name": "setArtist",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
@@ -1071,37 +1155,81 @@ let ABI_N = [
         "type": "function"
     }
 ]
-let current={}
+let current = {}
 
 
 
 function goonServe() {
     current.myContract.events.NewNFTwraped(
         {
-           
-        }, 
-        function(error, event) {
-            console.log("******result:*******\n"+JSON.stringify(event));
+
+        },
+        async function (error, event) {
+            if (error) {
+                console.log(error)
+            } else {
+                console.log("******wrap result:*******\n" + JSON.stringify(event));
+                let wrap = new WrapEvents(event)
+                let result = await wrap.save();
+                console.log(result)
+            }
+
         }
     );
-//     //订阅
-// let subscription = web3.eth.subscribe('NewNFTwraped', {}, function(error, result){
-//     if (!error){
-//         console.log(result);
-//         let res=  WrapEvents.insertMany(result)
-//     }
-        
-// });
-// // unsubscribes the subscription
-// subscription.unsubscribe(function(error, success){
-//     if(success)
-//         console.log('Successfully unsubscribed!');
-// });
+    current.myContract.events.dNFTbought(
+        {
+
+        },
+        async function (error, event) {
+            if (error) {
+                console.log(error)
+            } else {
+                console.log("******buy result:*******\n" + JSON.stringify(event));
+                let buy = new BuyEvents(event)
+                let result = await buy.save();
+                console.log(result)
+            }
+        }
+    );
+
+    //     //订阅
+    // let subscription = web3.eth.subscribe('syncing', function (error, result) {
+    //     if (!error) {
+    //         console.log("******syncing result:*******\n" + JSON.stringify(result));
+    //     }
+
+    // });
+    // let subscription2 = web3.eth.subscribe('logs', {
+    //     address: '0xD49091863732A03901e46074127Fd04e15080572',
+    //     topics: ['0x0df79c12', '0x167c576f']
+    // }, function (error, result) {
+    //     if (!error) {
+    //         console.log("******logs result:*******\n" + JSON.stringify(result));
+    //     }
+
+    // });
+    // let subscription3 = web3.eth.subscribe('newBlockHeaders', function (error, result) {
+    //     if (!error) {
+    //         console.log("******newBlockHeaders result:*******\n" + JSON.stringify(result));
+    //     }
+
+    // });
+    // let subscription4 = web3.eth.subscribe('pendingTransactions', function (error, result) {
+    //     if (!error) {
+    //         console.log("******pendingTransactions result:*******\n" + JSON.stringify(result));
+    //     }
+
+    // });
+    // // unsubscribes the subscription
+    // subscription.unsubscribe(function(error, success){
+    //     if(success)
+    //         console.log('Successfully unsubscribed!');
+    // });
 }
 
 
 function main() {
-    current.myContract=init()
+    current.myContract = init()
     // getPastEvents()
     // uri(2)
     // tokenUri(2)
@@ -1111,91 +1239,93 @@ main()
 
 function init() {
     web3 = new Web3(Web3.givenProvider || new Web3.providers.WebsocketProvider("wss://kovan.infura.io/ws/v3/bd6e30f7beaf4dc9ad34adf9792bd509"))
-    web3.eth.defaultAccount = '0x65D17D3dC59b5ce3d4CE010eB1719882b3f10490';
+    web3.eth.defaultAccount = myAddress;
+
+    let a = web3.eth.abi.encodeFunctionSignature('wrap(address,uint128)') //'0x0df79c12'
+    let b = web3.eth.abi.encodeFunctionSignature('dNFTbuyer(uint256)') //'0x167c576f'
+    console.log(a, b)
+
     const myContract = new web3.eth.Contract(ABI, address); //dnft
-    
-        // const myContract = new web3.eth.Contract(ABI_N, address_N); //nft
-        // current.account = window.ethereum.selectedAddress;
-        // current.network = window.ethereum.chainId;
+    // const myContract = new web3.eth.Contract(ABI_N, address_N); //nft
     return myContract;
 }
 
 
 function uri(id) {
     return new Promise((resolve, reject) => {
-      console.log(current);
-      current.myContract.methods
-        .uri(id)
-        .call()
-        .then(function (result) {
-          console.log('uri: ' + JSON.stringify(result));
-          resolve(result);
-        })
-        .catch((e) => console.log(e));
+        console.log(current);
+        current.myContract.methods
+            .uri(id)
+            .call()
+            .then(function (result) {
+                console.log('uri: ' + JSON.stringify(result));
+                resolve(result);
+            })
+            .catch((e) => console.log(e));
     });
-  }
+}
 
-  function tokenUri(id) {
+function tokenUri(id) {
     return new Promise((resolve, reject) => {
-      console.log(current);
-      current.myContract.methods
-        .tokenURI(id)
-        .call()
-        .then(function (result) {
-          console.log('token uri: ' + JSON.stringify(result));
-          resolve(result);
-        })
-        .catch((e) => console.log(e));
+        console.log(current);
+        current.myContract.methods
+            .tokenURI(id)
+            .call()
+            .then(function (result) {
+                console.log('token uri: ' + JSON.stringify(result));
+                resolve(result);
+            })
+            .catch((e) => console.log(e));
     });
-  }
+}
 
 function getPastEvents(eventName = 'NewNFTwraped') {
     return new Promise((resolve, reject) => {
-      console.log(current);
-      current.myContract
-        .getPastEvents(eventName, { fromBlock: 0, toBlock: 'latest' })
-        .then(function (result) {
-          console.log('events: ' + JSON.stringify(result));
-          resolve(result);
-          let events = [
-            {
-              address: '0x4667fbC2C61fb2370F8314b356924E01Fe2e1A6e',
-              blockHash:
-                '0xa0cc7d75b7e549c8ec6ac8d81d180886fedeb42d0eca34cff9420a8559a88b51',
-              blockNumber: 23861142,
-              logIndex: 3,
-              removed: false,
-              transactionHash:
-                '0xd7b90e62e5585eece2113b672e3787e1bd0d2c53a024f84ea0bc79c0354f0dcf',
-              transactionIndex: 1,
-              transactionLogIndex: '0x3',
-              type: 'mined',
-              id: 'log_cdb2d4d0',
-              returnValues: {
-                0: '0x227897e07508229AA6F794D39681428351447201',
-                1: '2',
-                2: '0x65D17D3dC59b5ce3d4CE010eB1719882b3f10490',
-                NFTCotract: '0x227897e07508229AA6F794D39681428351447201',
-                NFTid: '2',
-                Principal: '0x65D17D3dC59b5ce3d4CE010eB1719882b3f10490',
-              },
-              event: 'NewNFTwraped',
-              signature:
-                '0x4958f28e48c3d79a95eee5a92db2dd8f218fce330b02d862233214f605baadd1',
-              raw: {
-                data: '0x',
-                topics: [
-                  '0x4958f28e48c3d79a95eee5a92db2dd8f218fce330b02d862233214f605baadd1',
-                  '0x000000000000000000000000227897e07508229aa6f794d39681428351447201',
-                  '0x0000000000000000000000000000000000000000000000000000000000000002',
-                  '0x00000000000000000000000065d17d3dc59b5ce3d4ce010eb1719882b3f10490',
-                ],
-              },
-            },
-          ];
+        console.log(current);
+        current.myContract
+            .getPastEvents(eventName, { fromBlock: 0, toBlock: 'latest' })
+            .then(function (result) {
+                console.log('events: ' + JSON.stringify(result));
+                resolve(result);
+                let events = [
+                    {
+                        address: '0x4667fbC2C61fb2370F8314b356924E01Fe2e1A6e',
+                        blockHash:
+                            '0xa0cc7d75b7e549c8ec6ac8d81d180886fedeb42d0eca34cff9420a8559a88b51',
+                        blockNumber: 23861142,
+                        logIndex: 3,
+                        removed: false,
+                        transactionHash:
+                            '0xd7b90e62e5585eece2113b672e3787e1bd0d2c53a024f84ea0bc79c0354f0dcf',
+                        transactionIndex: 1,
+                        transactionLogIndex: '0x3',
+                        type: 'mined',
+                        id: 'log_cdb2d4d0',
+                        returnValues: {
+                            0: '0x227897e07508229AA6F794D39681428351447201',
+                            1: '2',
+                            2: '0x65D17D3dC59b5ce3d4CE010eB1719882b3f10490',
+                            NFTCotract: '0x227897e07508229AA6F794D39681428351447201',
+                            NFTid: '2',
+                            Principal: '0x65D17D3dC59b5ce3d4CE010eB1719882b3f10490',
+                        },
+                        event: 'NewNFTwraped',
+                        signature:
+                            '0x4958f28e48c3d79a95eee5a92db2dd8f218fce330b02d862233214f605baadd1',
+                        raw: {
+                            data: '0x',
+                            topics: [
+                                '0x4958f28e48c3d79a95eee5a92db2dd8f218fce330b02d862233214f605baadd1',
+                                '0x000000000000000000000000227897e07508229aa6f794d39681428351447201',
+                                '0x0000000000000000000000000000000000000000000000000000000000000002',
+                                '0x00000000000000000000000065d17d3dc59b5ce3d4ce010eb1719882b3f10490',
+                            ],
+                        },
+                    },
+                ];
 
-          let NFTlist = events.map((res) => res.returnValues);
-        })
-        .catch((e) => console.log(e));
+                let NFTlist = events.map((res) => res.returnValues);
+            })
+            .catch((e) => console.log(e));
     });
-  }
+}
