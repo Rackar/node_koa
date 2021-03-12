@@ -4,7 +4,7 @@ var Schema = mongoose.Schema;
 
 var BuySchema = new Schema({
     address: String,
-
+    transactionHash: String,
     returnValues: {
         Buyer: String,
         dNFTid: String,

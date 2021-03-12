@@ -1159,7 +1159,7 @@ let current = {}
 
 
 
-function goonServe() {
+function listenEvents() {
     current.myContract.events.NewNFTwraped(
         {
 
@@ -1227,15 +1227,49 @@ function goonServe() {
     // });
 }
 
+async function syncEvents() {
+    let wrapevents = await getPastEvents('NewNFTwraped')
+    let buyevents = await getPastEvents('dNFTbought')
+    let wrapres = await WrapEvents.find()
+    let buyres = await BuyEvents.find()
+    console.log(wrapevents.length, buyevents.length, wrapres.length, buyres.length)
+    let addWraps = []
+    let addBuyers = []
+    for (let index = 0; index < wrapevents.length; index++) {
+        const wrap = wrapevents[index];
+        let exist = wrapres.some(w => w.transactionHash === wrap.transactionHash)
+        if (!exist) {
+            addWraps.push(wrap)
+        }
+    }
+    for (let index = 0; index < buyevents.length; index++) {
+        const buyer = buyevents[index];
+        let exist = buyres.some(b => b.transactionHash === buyer.transactionHash)
+        if (!exist) {
+            addBuyers.push(buyer)
+        }
+    }
+    if (addWraps.length) {
+        let resW = await WrapEvents.insertMany(addWraps)
+        console.log("定时与链上同步，添加上架数据：", resW.length, "条")
+    }
+    if (addBuyers.length) {
+        let resB = await BuyEvents.insertMany(addBuyers)
+        console.log("定时与链上同步，添加上架和购买条数：", resB.length, "条")
+    }
+}
+
 
 function main() {
     current.myContract = init()
     // getPastEvents()
     // uri(2)
     // tokenUri(2)
-    goonServe()
+    listenEvents()
+    syncEvents()
+    setInterval(syncEvents, 3600000)
 }
-// main()
+main()
 
 function init() {
     web3 = new Web3(Web3.givenProvider || new Web3.providers.WebsocketProvider("wss://kovan.infura.io/ws/v3/bd6e30f7beaf4dc9ad34adf9792bd509"))
@@ -1281,47 +1315,47 @@ function tokenUri(id) {
 
 function getPastEvents(eventName = 'NewNFTwraped') {
     return new Promise((resolve, reject) => {
-        console.log(current);
+        // console.log(current);
         current.myContract
             .getPastEvents(eventName, { fromBlock: 0, toBlock: 'latest' })
             .then(function (result) {
-                console.log('events: ' + JSON.stringify(result));
+                // console.log('events: ' + JSON.stringify(result));
                 resolve(result);
                 let events = [
-                    {
-                        address: '0x4667fbC2C61fb2370F8314b356924E01Fe2e1A6e',
-                        blockHash:
-                            '0xa0cc7d75b7e549c8ec6ac8d81d180886fedeb42d0eca34cff9420a8559a88b51',
-                        blockNumber: 23861142,
-                        logIndex: 3,
-                        removed: false,
-                        transactionHash:
-                            '0xd7b90e62e5585eece2113b672e3787e1bd0d2c53a024f84ea0bc79c0354f0dcf',
-                        transactionIndex: 1,
-                        transactionLogIndex: '0x3',
-                        type: 'mined',
-                        id: 'log_cdb2d4d0',
-                        returnValues: {
-                            0: '0x227897e07508229AA6F794D39681428351447201',
-                            1: '2',
-                            2: '0x65D17D3dC59b5ce3d4CE010eB1719882b3f10490',
-                            NFTCotract: '0x227897e07508229AA6F794D39681428351447201',
-                            NFTid: '2',
-                            Principal: '0x65D17D3dC59b5ce3d4CE010eB1719882b3f10490',
-                        },
-                        event: 'NewNFTwraped',
-                        signature:
-                            '0x4958f28e48c3d79a95eee5a92db2dd8f218fce330b02d862233214f605baadd1',
-                        raw: {
-                            data: '0x',
-                            topics: [
-                                '0x4958f28e48c3d79a95eee5a92db2dd8f218fce330b02d862233214f605baadd1',
-                                '0x000000000000000000000000227897e07508229aa6f794d39681428351447201',
-                                '0x0000000000000000000000000000000000000000000000000000000000000002',
-                                '0x00000000000000000000000065d17d3dc59b5ce3d4ce010eb1719882b3f10490',
-                            ],
-                        },
-                    },
+                    // {
+                    //     address: '0x4667fbC2C61fb2370F8314b356924E01Fe2e1A6e',
+                    //     blockHash:
+                    //         '0xa0cc7d75b7e549c8ec6ac8d81d180886fedeb42d0eca34cff9420a8559a88b51',
+                    //     blockNumber: 23861142,
+                    //     logIndex: 3,
+                    //     removed: false,
+                    //     transactionHash:
+                    //         '0xd7b90e62e5585eece2113b672e3787e1bd0d2c53a024f84ea0bc79c0354f0dcf',
+                    //     transactionIndex: 1,
+                    //     transactionLogIndex: '0x3',
+                    //     type: 'mined',
+                    //     id: 'log_cdb2d4d0',
+                    //     returnValues: {
+                    //         0: '0x227897e07508229AA6F794D39681428351447201',
+                    //         1: '2',
+                    //         2: '0x65D17D3dC59b5ce3d4CE010eB1719882b3f10490',
+                    //         NFTCotract: '0x227897e07508229AA6F794D39681428351447201',
+                    //         NFTid: '2',
+                    //         Principal: '0x65D17D3dC59b5ce3d4CE010eB1719882b3f10490',
+                    //     },
+                    //     event: 'NewNFTwraped',
+                    //     signature:
+                    //         '0x4958f28e48c3d79a95eee5a92db2dd8f218fce330b02d862233214f605baadd1',
+                    //     raw: {
+                    //         data: '0x',
+                    //         topics: [
+                    //             '0x4958f28e48c3d79a95eee5a92db2dd8f218fce330b02d862233214f605baadd1',
+                    //             '0x000000000000000000000000227897e07508229aa6f794d39681428351447201',
+                    //             '0x0000000000000000000000000000000000000000000000000000000000000002',
+                    //             '0x00000000000000000000000065d17d3dc59b5ce3d4ce010eb1719882b3f10490',
+                    //         ],
+                    //     },
+                    // },
                 ];
 
                 let NFTlist = events.map((res) => res.returnValues);
@@ -1331,3 +1365,4 @@ function getPastEvents(eventName = 'NewNFTwraped') {
 }
 
 exports.main = main
+exports.getPastEvents = getPastEvents

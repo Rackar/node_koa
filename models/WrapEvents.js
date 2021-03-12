@@ -4,6 +4,7 @@ var Schema = mongoose.Schema;
 
 var WrapSchema = new Schema({
     address: String,
+    transactionHash: String,
     returnValues: {
         NFTCotract: String,
         NFTid: String,
