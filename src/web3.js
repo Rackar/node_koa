@@ -1235,7 +1235,7 @@ function main() {
     // tokenUri(2)
     goonServe()
 }
-main()
+// main()
 
 function init() {
     web3 = new Web3(Web3.givenProvider || new Web3.providers.WebsocketProvider("wss://kovan.infura.io/ws/v3/bd6e30f7beaf4dc9ad34adf9792bd509"))
@@ -1329,3 +1329,5 @@ function getPastEvents(eventName = 'NewNFTwraped') {
             .catch((e) => console.log(e));
     });
 }
+
+exports.main = main

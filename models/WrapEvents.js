@@ -7,6 +7,7 @@ var WrapSchema = new Schema({
     returnValues: {
         NFTCotract: String,
         NFTid: String,
+        dNFTid: String,
         Principal: String
     }
 }, { strict: false, timestamps: true });

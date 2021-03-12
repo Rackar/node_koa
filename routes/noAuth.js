@@ -3,6 +3,7 @@ const Article = require("../models/article");
 const users = require("./users/index");
 const upload = require("./upload");
 const person = require("./noauth/person/index");
+const filoli = require("./noauth/filoli/index");
 const lianyue = require("./noauth/lianyue/addArticle");
 router.prefix("/noauth");
 
@@ -22,5 +23,6 @@ router.prefix("/noauth");
 router.use(users.routes(), users.allowedMethods()); // /login  /signup
 router.use(upload.routes(), upload.allowedMethods()); // /upload
 router.use(person.routes(), person.allowedMethods()); // /person
-router.use(lianyue.routes(), lianyue.allowedMethods()); // /person
+router.use(lianyue.routes(), lianyue.allowedMethods()); // /lianyue
+router.use(filoli.routes(), filoli.allowedMethods()); // /filoli
 module.exports = router;
