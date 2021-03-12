@@ -39,7 +39,8 @@ const dnfts = async function (ctx, next) {
         NFTCotract: de.returnValues.NFTCotract,
         NFTid: de.returnValues.NFTid,
         dNFTid: de.returnValues.dNFTid,
-        Principal: de.returnValues.Principal
+        Principal: de.returnValues.Principal,
+        updatedAt: de.updatedAt
       }
     })
 
@@ -69,7 +70,8 @@ const boughters = async function (ctx, next) {
       return {
         Buyer: de.returnValues.Buyer,
         dNFTid: de.returnValues.dNFTid,
-        amount: de.returnValues.amount
+        amount: de.returnValues.amount,
+        updatedAt: de.updatedAt
       }
     })
 

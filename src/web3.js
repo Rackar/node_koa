@@ -1269,7 +1269,7 @@ function main() {
     syncEvents()
     setInterval(syncEvents, 3600000)
 }
-main()
+// main()
 
 function init() {
     web3 = new Web3(Web3.givenProvider || new Web3.providers.WebsocketProvider("wss://kovan.infura.io/ws/v3/bd6e30f7beaf4dc9ad34adf9792bd509"))
