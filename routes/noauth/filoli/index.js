@@ -1,36 +1,45 @@
 const router = require("koa-router")();
 const BuyEvents = require("../../../models/BuyEvents");
 const WrapEvents = require("../../../models/WrapEvents");
+const Comment = require("../../../models/Comment");
 router.prefix("/filoli");
-var add = async function (ctx, next) {
+const addComment = async function (ctx, next) {
   // res.send('respond with a resource');
-  let addStarsNum = ctx.request.body.stars;
-  let id = ctx.state.user.userid;
-  console.log("add Stars: " + addStarsNum);
-  //   let user = await User.findOne({_id: id});
-  let log = {
-    stars: addStarsNum,
-    createdAt: Date.now()
-  };
+  let comment = ctx.request.body.comment;
+  let CommentModel = new Comment(comment)
 
-  let result = await User.updateOne(
-    {
-      _id: id
-    },
-    {
-      $addToSet: {
-        starsLogs: [log]
-      }
-    }
-  );
+  let result = await CommentModel.save()
   if (result) {
     ctx.body = {
       status: 1,
       msg: "增加成功"
     };
+  } else {
+    ctx.body = {
+      status: 0,
+      msg: "增加失败"
+    };
   }
 };
-
+const getComment = async function (ctx, next) {
+  let id = ctx.query.id;
+  let comments = await Comment.find(
+    { dNFTid: id },
+  );
+  if (comments && comments.length) {
+    ctx.body = {
+      status: 1,
+      msg: "已获取所有评论",
+      data: comments
+    };
+  } else {
+    ctx.body = {
+      status: 0,
+      msg: "无数据",
+      data: []
+    };
+  }
+};
 const dnfts = async function (ctx, next) {
   let dnfts = await WrapEvents.find();
   if (dnfts && dnfts.length) {
@@ -91,4 +100,6 @@ const boughters = async function (ctx, next) {
 
 router.get("/dnfts", dnfts);
 router.get("/boughters", boughters);
+router.get("/comments", getComment);
+router.post("/comments", addComment);
 module.exports = router;
