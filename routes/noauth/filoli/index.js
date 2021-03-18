@@ -1,7 +1,9 @@
 const router = require("koa-router")();
+const web3 = require('web3');
 const BuyEvents = require("../../../models/BuyEvents");
 const WrapEvents = require("../../../models/WrapEvents");
 const Comment = require("../../../models/Comment");
+const NFT = require("../../../models/NFT");
 router.prefix("/filoli");
 const addComment = async function (ctx, next) {
   // res.send('respond with a resource');
@@ -68,8 +70,16 @@ const dnfts = async function (ctx, next) {
 };
 const boughters = async function (ctx, next) {
   let id = ctx.query.id;
+  let uad = ctx.query.uad;
+  let query = {}
+  if (id) {
+    query["returnValues.dNFTid"] = id
+  }
+  if (uad) {
+    query["returnValues.Buyer"] = web3.utils.toChecksumAddress(uad)
+  }
   let buyer = await BuyEvents.find(
-    { "returnValues.dNFTid": id },
+    query,
     // {
     //   "returnValues.$": 1
     // }
@@ -97,9 +107,47 @@ const boughters = async function (ctx, next) {
     };
   }
 };
+const addNFT = async function (ctx, next) {
+  let nft = ctx.request.body.nft;
+  let NFTModel = new NFT(nft)
+
+  let result = await NFTModel.save()
+  if (result) {
+    ctx.body = {
+      status: 1,
+      msg: "增加成功"
+    };
+  } else {
+    ctx.body = {
+      status: 0,
+      msg: "增加失败"
+    };
+  }
+};
+const getNFT = async function (ctx, next) {
+  let id = ctx.query.id;
+  let uad = ctx.query.uad;
+
+  let result = await NFT.find(
+    { id: id },
+  );
+  if (result) {
+    ctx.body = {
+      status: 1,
+      msg: "增加成功"
+    };
+  } else {
+    ctx.body = {
+      status: 0,
+      msg: "增加失败"
+    };
+  }
+};
 
 router.get("/dnfts", dnfts);
 router.get("/boughters", boughters);
 router.get("/comments", getComment);
 router.post("/comments", addComment);
+router.post("/nfts", addNFT);
+router.get("/nfts", getNFT);
 module.exports = router;
