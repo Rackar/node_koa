@@ -1160,6 +1160,7 @@ let current = {}
 
 
 function listenEvents() {
+    console.log('begin listen events')
     current.myContract.events.NewNFTwraped(
         {
 

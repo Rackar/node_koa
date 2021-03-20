@@ -43,7 +43,12 @@ const getComment = async function (ctx, next) {
   }
 };
 const dnfts = async function (ctx, next) {
-  let dnfts = await WrapEvents.find();
+  let uad = ctx.query.uad;
+  let query = {}
+  if (uad) {
+    query["returnValues.Principal"] = web3.utils.toChecksumAddress(uad)
+  }
+  let dnfts = await WrapEvents.find(query);
   if (dnfts && dnfts.length) {
     let list = dnfts.map(de => {
       return {
@@ -126,20 +131,20 @@ const addNFT = async function (ctx, next) {
 };
 const getNFT = async function (ctx, next) {
   let id = ctx.query.id;
-  let uad = ctx.query.uad;
 
-  let result = await NFT.find(
-    { id: id },
+  let result = await NFT.findOne(
+    { nftid: id },
   );
   if (result) {
     ctx.body = {
       status: 1,
-      msg: "增加成功"
+      msg: "查询成功",
+      data: result
     };
   } else {
     ctx.body = {
       status: 0,
-      msg: "增加失败"
+      msg: "查询失败"
     };
   }
 };

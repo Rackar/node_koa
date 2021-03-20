@@ -52,13 +52,13 @@ if (process.env.NODE_ENV === "production") {
 /**
  * Listen on provided port, on all network interfaces.
  */
-
+web3.main()
 server.listen(port);
 console.log("Server start listening on: " + port);
 server.on("error", onError);
 server.on("listening", onListening);
 
-web3.main()
+
 
 function normalizePort(val) {
   var port = parseInt(val, 10);
