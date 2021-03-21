@@ -59,7 +59,20 @@ const dnfts = async function (ctx, next) {
         updatedAt: de.updatedAt
       }
     })
+    let nftIds = list.map(de => de.NFTid)
+    let nftMetas = await NFT.find({ nftid: { $in: nftIds } });
 
+    let newList = list.map(el => {
+      let obj = nftMetas.find(item => item.nftid == el.NFTid)
+      if (obj) {
+        el.name = obj.name
+        el.description = obj.description
+        el.image = obj.image
+      }
+      return el
+
+    })
+    console.log(newList)
     ctx.body = {
       status: 1,
       msg: "已获取所有dNFT",
