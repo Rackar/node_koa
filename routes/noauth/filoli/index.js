@@ -86,6 +86,16 @@ const dnfts = async function (ctx, next) {
     };
   }
 };
+
+async function findMetaWithDNFTid(dNFTid) {
+  let res = await WrapEvents.findOne({ "returnValues.dNFTid": dNFTid })
+  let meta = await NFT.findOne({ nftid: res.returnValues.NFTid })
+  if (meta && meta.name)
+    return meta
+  else
+    return {}
+
+}
 const boughters = async function (ctx, next) {
   let id = ctx.query.id;
   let uad = ctx.query.uad;
@@ -111,6 +121,14 @@ const boughters = async function (ctx, next) {
         updatedAt: de.updatedAt
       }
     })
+
+    //后端查NFT名称，不太必要
+    // for (let i = 0; i < list.length; i++) {
+    //   const dNFTid = list[i].dNFTid;
+    //   let res = await WrapEvents.findOne({ "returnValues.dNFTid": dNFTid })
+    //   let meta = await NFT.findOne({ nftid: res.returnValues.NFTid })
+    //   if (meta && meta.name) { list[i].name = meta.name }
+    // }
 
     ctx.body = {
       status: 1,
@@ -162,10 +180,10 @@ const getNFT = async function (ctx, next) {
   }
 };
 
-router.get("/dnfts", dnfts);
-router.get("/boughters", boughters);
-router.get("/comments", getComment);
-router.post("/comments", addComment);
-router.post("/nfts", addNFT);
-router.get("/nfts", getNFT);
+router.get("/dnfts", dnfts); //拉取dnfts
+router.get("/boughters", boughters);//获取购买者
+router.get("/comments", getComment);//拉取评论
+router.post("/comments", addComment);//添加评论
+router.post("/nfts", addNFT); //测试添加nft
+router.get("/nfts", getNFT); //测试获取单个nft
 module.exports = router;
