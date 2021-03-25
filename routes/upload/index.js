@@ -1,17 +1,24 @@
 const router = require("koa-router")();
 const multer = require("koa-multer");
+const fs = require('fs')
 
 router.prefix("/upload");
+const uploadDir="uploads/"
 
 const storage = multer.diskStorage({
   destination: function(req, file, cb) {
-    cb(null, "uploads/");
+    cb(null, uploadDir);
   },
   filename: function(req, file, cb) {
     cb(null, file.fieldname + "-" + Date.now() + file.originalname);
   }
 });
 const upload = multer({ storage: storage });
+
+const exist= fs.existsSync(uploadDir)
+if(!exist){
+  fs.mkdirSync(uploadDir)
+}
 
 router.post("/image", upload.single("avatar"), function(ctx, next) {
   let data = {

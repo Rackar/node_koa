@@ -1252,11 +1252,11 @@ async function syncEvents() {
     }
     if (addWraps.length) {
         let resW = await WrapEvents.insertMany(addWraps)
-        console.log("定时与链上同步，添加上架数据：", resW.length, "条")
+        console.log("与链上同步，已添加上架数据：", resW.length, "条")
     }
     if (addBuyers.length) {
         let resB = await BuyEvents.insertMany(addBuyers)
-        console.log("定时与链上同步，添加上架和购买条数：", resB.length, "条")
+        console.log("与链上同步，已添加购买条数：", resB.length, "条")
     }
 }
 
