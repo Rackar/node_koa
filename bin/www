@@ -31,8 +31,8 @@ if (process.env.NODE_ENV === "production") {
   var options = {
     // key: fs.readFileSync("./key/2910531_talatan.com.key"),
     // cert: fs.readFileSync("./key/2910531_talatan.com.pem")
-    key: fs.readFileSync("/root/secret/2_www.codingyang.com.key"),
-    cert: fs.readFileSync("/root/secret/1_www.codingyang.com_bundle.crt")
+    key: fs.readFileSync("/home/ec2-user/ssl/filoli.key"),
+    cert: fs.readFileSync("/home/ec2-user/ssl/filoli_io_bundle.crt")
   };
   var httpsServer = https.createServer(options, app.callback());
 
