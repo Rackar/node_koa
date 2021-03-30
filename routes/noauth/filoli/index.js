@@ -72,11 +72,10 @@ const dnfts = async function (ctx, next) {
       return el
 
     })
-    console.log(newList)
     ctx.body = {
       status: 1,
       msg: "已获取所有dNFT",
-      data: list
+      data: newList
     };
   } else {
     ctx.body = {
