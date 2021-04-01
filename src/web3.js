@@ -1158,7 +1158,33 @@ let ABI_N = [
 ]
 let current = {}
 
-
+function getSellingStatus(dnftid) {
+    let myContract = init()
+    return new Promise((resolve, reject) => {
+        myContract.methods
+            .idTodNFT(dnftid)
+            .call()
+            .then(function (result) {
+                let { sellFinishTime, salesRevenue } = result;
+                let selling = false
+                if (sellFinishTime) {
+                    let endDate = new Date(sellFinishTime * 1000);
+                    if (endDate > Date.now()) {
+                        selling = true
+                    } else {
+                        selling = false
+                    }
+                } else {
+                    selling = false
+                }
+                resolve(selling);
+            })
+            .catch((e) => {
+                resolve(false)
+                console.log(e);
+            });
+    });
+}
 
 function listenEvents() {
     console.log('begin listen events')
@@ -1371,3 +1397,4 @@ function getPastEvents(eventName = 'NewNFTwraped') {
 
 exports.main = main
 exports.getPastEvents = getPastEvents
+exports.getSellingStatus = getSellingStatus
