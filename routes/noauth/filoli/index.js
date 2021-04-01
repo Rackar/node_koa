@@ -179,10 +179,21 @@ const getNFT = async function (ctx, next) {
   }
 };
 
+const getETHprice = async function (ctx, next) {
+  let price = global.ethPrice
+  ctx.body = {
+    status: 1,
+    msg: "查询成功",
+    data: price
+  };
+
+};
+
 router.get("/dnfts", dnfts); //拉取dnfts
 router.get("/boughters", boughters);//获取购买者
 router.get("/comments", getComment);//拉取评论
 router.post("/comments", addComment);//添加评论
 router.post("/nfts", addNFT); //测试添加nft
 router.get("/nfts", getNFT); //测试获取单个nft
+router.get("/ethprice", getETHprice); //获取eth币市值
 module.exports = router;

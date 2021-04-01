@@ -1,6 +1,7 @@
 const Web3 = require('web3');
 const WrapEvents = require("../models/WrapEvents");
 const BuyEvents = require("../models/BuyEvents");
+const freshGolbalPrice = require('./ethPrice')
 
 let web3;
 
@@ -1261,7 +1262,7 @@ async function syncEvents() {
 }
 
 
-function main() {
+async function main() {
     current.myContract = init()
     // getPastEvents()
     // uri(2)
@@ -1269,6 +1270,9 @@ function main() {
     listenEvents()
     syncEvents()
     setInterval(syncEvents, 3600000)
+    await freshGolbalPrice()
+    console.log(global.ethPrice)
+    setInterval(freshGolbalPrice, 10 * 60 * 1000)
 }
 // main()
 
