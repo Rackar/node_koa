@@ -4,6 +4,7 @@ const BuyEvents = require("../../../models/BuyEvents");
 const WrapEvents = require("../../../models/WrapEvents");
 const Comment = require("../../../models/Comment");
 const NFT = require("../../../models/NFT");
+let myWeb3 = require('../../../src/web3')
 router.prefix("/filoli");
 const addComment = async function (ctx, next) {
   // res.send('respond with a resource');
@@ -59,6 +60,54 @@ const dnfts = async function (ctx, next) {
         updatedAt: de.updatedAt
       }
     })
+    let nftIds = list.map(de => de.NFTid)
+    let nftMetas = await NFT.find({ nftid: { $in: nftIds } });
+
+    let newList = list.map(el => {
+      let obj = nftMetas.find(item => item.nftid == el.NFTid)
+      if (obj) {
+        el.name = obj.name
+        el.description = obj.description
+        el.image = obj.image
+      }
+      return el
+
+    })
+    ctx.body = {
+      status: 1,
+      msg: "已获取所有dNFT",
+      data: newList
+    };
+  } else {
+    ctx.body = {
+      status: 0,
+      msg: "无数据",
+      data: []
+    };
+  }
+};
+
+const sellingDnfts = async function (ctx, next) {
+  let uad = ctx.query.uad;
+  let query = {
+    Selling: true
+  }
+  if (uad) {
+    query["returnValues.Principal"] = web3.utils.toChecksumAddress(uad);
+  }
+  let dnfts = await WrapEvents.find(query);
+  if (dnfts && dnfts.length) {
+    let list = dnfts.map(async de => {
+      let sell = await myWeb3.getSellingStatus(de.returnValues.dNFTid)
+      return {
+        NFTCotract: de.returnValues.NFTCotract,
+        NFTid: de.returnValues.NFTid,
+        dNFTid: de.returnValues.dNFTid,
+        Principal: de.returnValues.Principal,
+        updatedAt: de.updatedAt,
+        selling: sell
+      }
+    }).filter(dnft => dnft.selling === true)
     let nftIds = list.map(de => de.NFTid)
     let nftMetas = await NFT.find({ nftid: { $in: nftIds } });
 

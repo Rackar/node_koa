@@ -1158,7 +1158,33 @@ let ABI_N = [
 ]
 let current = {}
 
-
+function getSellingStatus(dnftid) {
+    let myContract = init()
+    return new Promise((resolve, reject) => {
+        myContract.methods
+            .idTodNFT(dnftid)
+            .call()
+            .then(function (result) {
+                let { sellFinishTime, salesRevenue } = result;
+                let selling = false
+                if (sellFinishTime) {
+                    let endDate = new Date(sellFinishTime * 1000);
+                    if (endDate > Date.now()) {
+                        selling = true
+                    } else {
+                        selling = false
+                    }
+                } else {
+                    selling = false
+                }
+                resolve(selling);
+            })
+            .catch((e) => {
+                resolve(false)
+                console.log(e);
+            });
+    });
+}
 
 function listenEvents() {
     console.log('begin listen events')
@@ -1230,6 +1256,7 @@ function listenEvents() {
 }
 
 async function syncEvents() {
+    current.myContract = init()
     let wrapevents = await getPastEvents('NewNFTwraped')
     let buyevents = await getPastEvents('dNFTbought')
     let wrapres = await WrapEvents.find()
@@ -1269,7 +1296,7 @@ async function main() {
     // tokenUri(2)
     listenEvents()
     syncEvents()
-    setInterval(syncEvents, 3600000)
+    // setInterval(syncEvents, 3600000) //TODO 监听失效报错，暂时屏蔽
     await freshGolbalPrice()
     console.log(global.ethPrice)
     setInterval(freshGolbalPrice, 10 * 60 * 1000)
@@ -1317,10 +1344,12 @@ function tokenUri(id) {
             .catch((e) => console.log(e));
     });
 }
+// getPastEvents()
 
 function getPastEvents(eventName = 'NewNFTwraped') {
+    current.myContract = init()
     return new Promise((resolve, reject) => {
-        // console.log(current);
+        console.log(current);
         current.myContract
             .getPastEvents(eventName, { fromBlock: 0, toBlock: 'latest' })
             .then(function (result) {
@@ -1370,4 +1399,5 @@ function getPastEvents(eventName = 'NewNFTwraped') {
 }
 
 exports.main = main
-exports.getPastEvents = getPastEvents
+// exports.getPastEvents = getPastEvents
+exports.getSellingStatus = getSellingStatus

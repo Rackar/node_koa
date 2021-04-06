@@ -9,7 +9,8 @@ var WrapSchema = new Schema({
         NFTCotract: String,
         NFTid: String,
         dNFTid: String,
-        Principal: String
+        Principal: String,
+        Selling: Boolean,
     }
 }, { strict: false, timestamps: true });
 module.exports = mongoose.model("Wrap", WrapSchema);

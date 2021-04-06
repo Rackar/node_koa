@@ -43,10 +43,10 @@ const handler = async (ctx, next) => {
   if (ctx.request.method == "OPTIONS") {
     ctx.response.status = 200;
   } else {
-    console.log(`Process ${ctx.request.method} ${ctx.request.url}`);
+    // console.log(`Process ${ctx.request.method} ${ctx.request.url}`);
     try {
       await next();
-      console.log("handler通过");
+      // console.log("handler通过");
     } catch (err) {
       console.log("handler处理错误");
       console.log(err);
@@ -78,8 +78,7 @@ app.use(handler);
 app.use(async (ctx, next) => {
   const start = new Date();
   await next();
-  const ms = new Date() - start;
-  console.log(`${start} got ${ctx.method}, use ${ms}ms`);
+  console.log(`  <-  ${ctx.method} start at ${start}`);
 });
 
 app.use(
