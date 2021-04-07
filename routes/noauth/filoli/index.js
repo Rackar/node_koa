@@ -57,6 +57,7 @@ const dnfts = async function (ctx, next) {
         NFTid: de.returnValues.NFTid,
         dNFTid: de.returnValues.dNFTid,
         Principal: de.returnValues.Principal,
+        Selling: de.returnValues.Selling,
         updatedAt: de.updatedAt
       }
     })

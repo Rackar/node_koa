@@ -2,6 +2,7 @@ const Web3 = require('web3');
 const WrapEvents = require("../models/WrapEvents");
 const BuyEvents = require("../models/BuyEvents");
 const freshGolbalPrice = require('./ethPrice')
+const ObjectID = require("mongodb").ObjectID;
 
 let web3;
 
@@ -1168,14 +1169,9 @@ function getSellingStatus(dnftid) {
                 let { sellFinishTime, salesRevenue } = result;
                 let selling = false
                 if (sellFinishTime) {
-                    let endDate = new Date(sellFinishTime * 1000);
-                    if (endDate > Date.now()) {
-                        selling = true
-                    } else {
-                        selling = false
-                    }
-                } else {
                     selling = false
+                } else {
+                    selling = true
                 }
                 resolve(selling);
             })
@@ -1184,6 +1180,32 @@ function getSellingStatus(dnftid) {
                 console.log(e);
             });
     });
+}
+// freshSelling()
+
+async function freshSelling() { //定时查找销售中的dnft是否销售完成
+    let wrapres = await WrapEvents.find({ "returnValues.Selling": { "$not": /false/ } })
+    let changedArray = []
+    for (let index = 0; index < wrapres.length; index++) {
+        const wrap = wrapres[index];
+        let id = wrap.returnValues.dNFTid;
+        let selling = await getSellingStatus(id)
+        if (selling === false) {
+            //更新状态
+            wrap.returnValues.Selling = "false"
+            changedArray.push(wrap)
+        }
+    }
+    if (changedArray.length) {
+        let ids = changedArray.map(ele => ObjectID(ele._id));
+        let result = await WrapEvents.updateMany({
+            _id: {
+                $in: ids
+            }
+        }, { "$set": { "returnValues.Selling": "false" } })
+        console.log(new Date(), " refresh selling data ", JSON.stringify(result))
+    }
+
 }
 
 function listenEvents() {
@@ -1300,29 +1322,36 @@ async function main() {
     await freshGolbalPrice()
     console.log(global.ethPrice)
     setInterval(freshGolbalPrice, 10 * 60 * 1000)
+    await freshSelling()
+    setInterval(freshSelling, 30 * 60 * 1000)
 }
 // main()
 
 function init() {
-    const options = {
-        // Enable auto reconnection
-        reconnect: {
-            auto: true,
-            delay: 5000, // ms
-            maxAttempts: 5,
-            onTimeout: false
-        }
-    };
-    web3 = new Web3(Web3.givenProvider || new Web3.providers.WebsocketProvider("wss://kovan.infura.io/ws/v3/bd6e30f7beaf4dc9ad34adf9792bd509", options))
-    web3.eth.defaultAccount = myAddress;
+    if (current.myContract) {
+        return current.myContract
+    } else {
+        const options = {
+            // Enable auto reconnection
+            reconnect: {
+                auto: true,
+                delay: 5000, // ms
+                maxAttempts: 5,
+                onTimeout: false
+            }
+        };
+        web3 = new Web3(Web3.givenProvider || new Web3.providers.WebsocketProvider("wss://kovan.infura.io/ws/v3/bd6e30f7beaf4dc9ad34adf9792bd509", options))
+        web3.eth.defaultAccount = myAddress;
 
-    let a = web3.eth.abi.encodeFunctionSignature('wrap(address,uint128)') //'0x0df79c12'
-    let b = web3.eth.abi.encodeFunctionSignature('dNFTbuyer(uint256)') //'0x167c576f'
-    console.log(a, b)
+        let a = web3.eth.abi.encodeFunctionSignature('wrap(address,uint128)') //'0x0df79c12'
+        let b = web3.eth.abi.encodeFunctionSignature('dNFTbuyer(uint256)') //'0x167c576f'
+        console.log(a, b)
 
-    const myContract = new web3.eth.Contract(ABI, address); //dnft
-    // const myContract = new web3.eth.Contract(ABI_N, address_N); //nft
-    return myContract;
+        const myContract = new web3.eth.Contract(ABI, address); //dnft
+        // const myContract = new web3.eth.Contract(ABI_N, address_N); //nft
+        return myContract;
+    }
+
 }
 
 
@@ -1354,6 +1383,7 @@ function tokenUri(id) {
     });
 }
 // getPastEvents()
+
 
 function getPastEvents(eventName = 'NewNFTwraped') {
     current.myContract = init()
