@@ -1166,10 +1166,17 @@ function getSellingStatus(dnftid) {
             .idTodNFT(dnftid)
             .call()
             .then(function (result) {
-                let { sellFinishTime, salesRevenue } = result;
+                let { sellFinishTime, lastBuyTimestamp, salesRevenue } = result;
                 let selling = false
                 if (sellFinishTime) {
                     selling = false
+                } else if (lastBuyTimestamp) {
+                    let endDate = new Date(lastBuyTimestamp * 1000) + 24 * 60 * 60 * 1000;
+                    if (endDate > Date.now()) {
+                        selling = true
+                    } else {
+                        selling = false
+                    }
                 } else {
                     selling = true
                 }
@@ -1181,10 +1188,10 @@ function getSellingStatus(dnftid) {
             });
     });
 }
-// freshSelling()
+freshSelling()
 
 async function freshSelling() { //定时查找销售中的dnft是否销售完成
-    let wrapres = await WrapEvents.find({ "returnValues.Selling": { "$not": /false/ } })
+    let wrapres = await WrapEvents.find({ "returnValues.Selling": { "$not": /falsee/ } })
     console.log('selling 状态未结束的数量为', wrapres.length)
     let changedArray = []
     for (let index = 0; index < wrapres.length; index++) {
