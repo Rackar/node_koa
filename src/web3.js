@@ -1188,7 +1188,7 @@ function getSellingStatus(dnftid) {
             });
     });
 }
-freshSelling()
+// freshSelling()
 
 async function freshSelling() { //定时查找销售中的dnft是否销售完成
     let wrapres = await WrapEvents.find({ "returnValues.Selling": { "$not": /falsee/ } })
@@ -1397,7 +1397,7 @@ function tokenUri(id) {
 function getPastEvents(eventName = 'NewNFTwraped') {
     current.myContract = init()
     return new Promise((resolve, reject) => {
-        console.log(current);
+        // console.log(current);
         current.myContract
             .getPastEvents(eventName, { fromBlock: 0, toBlock: 'latest' })
             .then(function (result) {
