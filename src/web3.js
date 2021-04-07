@@ -1191,7 +1191,7 @@ function getSellingStatus(dnftid) {
 // freshSelling()
 
 async function freshSelling() { //定时查找销售中的dnft是否销售完成
-    let wrapres = await WrapEvents.find({ "returnValues.Selling": { "$not": /falsee/ } })
+    let wrapres = await WrapEvents.find({ "returnValues.Selling": { "$not": /false/ } })
     console.log('selling 状态未结束的数量为', wrapres.length)
     let changedArray = []
     for (let index = 0; index < wrapres.length; index++) {
