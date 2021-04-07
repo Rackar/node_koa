@@ -1185,6 +1185,7 @@ function getSellingStatus(dnftid) {
 
 async function freshSelling() { //定时查找销售中的dnft是否销售完成
     let wrapres = await WrapEvents.find({ "returnValues.Selling": { "$not": /false/ } })
+    console.log('selling 状态未结束的数量为', wrapres.length)
     let changedArray = []
     for (let index = 0; index < wrapres.length; index++) {
         const wrap = wrapres[index];
@@ -1321,8 +1322,9 @@ async function main() {
     // setInterval(syncEvents, 3600000) //TODO 监听失效报错，暂时屏蔽
     await freshGolbalPrice()
     console.log(global.ethPrice)
-    setInterval(freshGolbalPrice, 10 * 60 * 1000)
     await freshSelling()
+
+    setInterval(freshGolbalPrice, 10 * 60 * 1000)
     setInterval(freshSelling, 30 * 60 * 1000)
 }
 // main()
