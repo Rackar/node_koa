@@ -3,7 +3,46 @@ const WrapEvents = require("../models/WrapEvents");
 const BuyEvents = require("../models/BuyEvents");
 const freshGolbalPrice = require('./ethPrice')
 
-let web3;
+const web3 = new Web3()
+
+/**
+ * Refreshes provider instance and attaches even handlers to it
+ */
+function refreshProvider(web3Obj, providerUrl) {
+    let retries = 0
+
+    function retry(event) {
+        if (event) {
+            console.log('Web3 provider disconnected or errored.')
+            retries += 1
+
+            if (retries > 5) {
+                console.log(`Max retries of 5 exceeding: ${retries} times tried`)
+                return setTimeout(refreshProvider, 5000)
+            } else if (retries > 12 * 60 * 24) {
+                console.log(`Final Max retries of 5 exceeding: ${retries} times tried,exit.`)
+            }
+        } else {
+            console.log(`Reconnecting web3 provider ${config.eth.provider}`)
+            refreshProvider(web3Obj, providerUrl)
+        }
+
+        return null
+    }
+
+    const provider = new Web3.providers.WebsocketProvider(providerUrl)
+
+    provider.on('end', () => retry())
+    provider.on('error', () => retry())
+
+    web3Obj.setProvider(provider)
+
+    console.log('New Web3 provider initiated')
+    current.myContract = new web3Obj.eth.Contract(ABI, address); //dnft
+    listenEvents()
+
+    return provider
+}
 
 const myAddress = "0x65D17D3dC59b5ce3d4CE010eB1719882b3f10490"
 
@@ -1256,7 +1295,6 @@ function listenEvents() {
 }
 
 async function syncEvents() {
-    current.myContract = init()
     let wrapevents = await getPastEvents('NewNFTwraped')
     let buyevents = await getPastEvents('dNFTbought')
     let wrapres = await WrapEvents.find()
@@ -1294,7 +1332,7 @@ async function main() {
     // getPastEvents()
     // uri(2)
     // tokenUri(2)
-    listenEvents()
+    // listenEvents()
     syncEvents()
     // setInterval(syncEvents, 3600000) //TODO 监听失效报错，暂时屏蔽
     await freshGolbalPrice()
@@ -1303,25 +1341,32 @@ async function main() {
 }
 // main()
 
+// function init() {
+//     const options = {
+//         // Enable auto reconnection
+//         reconnect: {
+//             auto: true,
+//             delay: 5000, // ms
+//             maxAttempts: 5,
+//             onTimeout: false
+//         }
+//     };
+//     web3 = new Web3(Web3.givenProvider || new Web3.providers.WebsocketProvider("wss://kovan.infura.io/ws/v3/bd6e30f7beaf4dc9ad34adf9792bd509", options))
+//     web3.eth.defaultAccount = myAddress;
+
+//     let a = web3.eth.abi.encodeFunctionSignature('wrap(address,uint128)') //'0x0df79c12'
+//     let b = web3.eth.abi.encodeFunctionSignature('dNFTbuyer(uint256)') //'0x167c576f'
+//     console.log(a, b)
+
+//     const myContract = new web3.eth.Contract(ABI, address); //dnft
+//     // const myContract = new web3.eth.Contract(ABI_N, address_N); //nft
+//     return myContract;
+// }
+
 function init() {
-    const options = {
-        // Enable auto reconnection
-        reconnect: {
-            auto: true,
-            delay: 5000, // ms
-            maxAttempts: 5,
-            onTimeout: false
-        }
-    };
-    web3 = new Web3(Web3.givenProvider || new Web3.providers.WebsocketProvider("wss://kovan.infura.io/ws/v3/bd6e30f7beaf4dc9ad34adf9792bd509", options))
+    refreshProvider(web3, 'wss://kovan.infura.io/ws/v3/bd6e30f7beaf4dc9ad34adf9792bd509')
     web3.eth.defaultAccount = myAddress;
-
-    let a = web3.eth.abi.encodeFunctionSignature('wrap(address,uint128)') //'0x0df79c12'
-    let b = web3.eth.abi.encodeFunctionSignature('dNFTbuyer(uint256)') //'0x167c576f'
-    console.log(a, b)
-
     const myContract = new web3.eth.Contract(ABI, address); //dnft
-    // const myContract = new web3.eth.Contract(ABI_N, address_N); //nft
     return myContract;
 }
 
@@ -1356,7 +1401,7 @@ function tokenUri(id) {
 // getPastEvents()
 
 function getPastEvents(eventName = 'NewNFTwraped') {
-    current.myContract = init()
+    // current.myContract = init()
     return new Promise((resolve, reject) => {
         console.log(current);
         current.myContract
