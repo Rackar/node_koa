@@ -14,7 +14,7 @@ function refreshProvider(web3Obj, providerUrl) {
 
     function retry(event) {
         if (event) {
-            console.log('Web3 provider disconnected or errored.')
+            console.log('Web3 provider disconnected or errored.', event)
             retries += 1
 
             if (retries > 5) {
