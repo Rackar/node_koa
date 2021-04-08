@@ -31,7 +31,12 @@ function refreshProvider(web3Obj, providerUrl) {
         return null
     }
 
-    const provider = new Web3.providers.WebsocketProvider(providerUrl)
+    const provider = new Web3.providers.WebsocketProvider(providerUrl, {
+        clientConfig: {
+            keepalive: true,
+            keepaliveInterval: 60000	// milliseconds
+        }
+    })
 
     provider.on('end', () => retry())
     provider.on('error', () => retry())
