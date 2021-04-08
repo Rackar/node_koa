@@ -2,6 +2,7 @@ const Web3 = require('web3');
 const WrapEvents = require("../models/WrapEvents");
 const BuyEvents = require("../models/BuyEvents");
 const freshGolbalPrice = require('./ethPrice')
+const ObjectID = require("mongodb").ObjectID;
 
 const web3 = new Web3()
 
@@ -1204,17 +1205,19 @@ function getSellingStatus(dnftid) {
             .idTodNFT(dnftid)
             .call()
             .then(function (result) {
-                let { sellFinishTime, salesRevenue } = result;
+                let { sellFinishTime, lastBuyTimestamp, salesRevenue } = result;
                 let selling = false
                 if (sellFinishTime) {
-                    let endDate = new Date(sellFinishTime * 1000);
+                    selling = false
+                } else if (lastBuyTimestamp) {
+                    let endDate = new Date(lastBuyTimestamp * 1000) + 24 * 60 * 60 * 1000;
                     if (endDate > Date.now()) {
                         selling = true
                     } else {
                         selling = false
                     }
                 } else {
-                    selling = false
+                    selling = true
                 }
                 resolve(selling);
             })
@@ -1223,6 +1226,33 @@ function getSellingStatus(dnftid) {
                 console.log(e);
             });
     });
+}
+// freshSelling()
+
+async function freshSelling() { //定时查找销售中的dnft是否销售完成
+    let wrapres = await WrapEvents.find({ "returnValues.Selling": { "$not": /false/ } })
+    console.log('selling 状态未结束的数量为', wrapres.length)
+    let changedArray = []
+    for (let index = 0; index < wrapres.length; index++) {
+        const wrap = wrapres[index];
+        let id = wrap.returnValues.dNFTid;
+        let selling = await getSellingStatus(id)
+        if (selling === false) {
+            //更新状态
+            wrap.returnValues.Selling = "false"
+            changedArray.push(wrap)
+        }
+    }
+    if (changedArray.length) {
+        let ids = changedArray.map(ele => ObjectID(ele._id));
+        let result = await WrapEvents.updateMany({
+            _id: {
+                $in: ids
+            }
+        }, { "$set": { "returnValues.Selling": "false" } })
+        console.log(new Date(), " refresh selling data ", JSON.stringify(result))
+    }
+
 }
 
 function listenEvents() {
@@ -1337,7 +1367,10 @@ async function main() {
     // setInterval(syncEvents, 3600000) //TODO 监听失效报错，暂时屏蔽
     await freshGolbalPrice()
     console.log(global.ethPrice)
+    await freshSelling()
+
     setInterval(freshGolbalPrice, 10 * 60 * 1000)
+    setInterval(freshSelling, 30 * 60 * 1000)
 }
 // main()
 
@@ -1403,7 +1436,7 @@ function tokenUri(id) {
 function getPastEvents(eventName = 'NewNFTwraped') {
     // current.myContract = init()
     return new Promise((resolve, reject) => {
-        console.log(current);
+        // console.log(current);
         current.myContract
             .getPastEvents(eventName, { fromBlock: 0, toBlock: 'latest' })
             .then(function (result) {
