@@ -24,7 +24,7 @@ function refreshProvider(web3Obj, providerUrl) {
                 console.log(`Final Max retries of 5 exceeding: ${retries} times tried,exit.`)
             }
         } else {
-            console.log(`Reconnecting web3 provider ${config.eth.provider}`)
+            console.log(`Reconnecting web3 provider`)
             refreshProvider(web3Obj, providerUrl)
         }
 
