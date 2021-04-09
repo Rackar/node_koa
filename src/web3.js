@@ -1204,7 +1204,7 @@ let ABI_N = [
 let current = {}
 
 function getSellingStatus(dnftid) {
-    let myContract = init()
+    let myContract = current.myContract || init()
     return new Promise((resolve, reject) => {
         myContract.methods
             .idTodNFT(dnftid)
