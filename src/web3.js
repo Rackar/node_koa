@@ -1215,12 +1215,8 @@ function getSellingStatus(dnftid) {
                 if (sellFinishTime) {
                     selling = false
                 } else if (lastBuyTimestamp) {
-                    let endDate = new Date(lastBuyTimestamp * 1000) + 24 * 60 * 60 * 1000;
-                    if (endDate > Date.now()) {
-                        selling = true
-                    } else {
-                        selling = false
-                    }
+                    let endDate = new Date(lastBuyTimestamp * 1000).getTime() + 24 * 60 * 60 * 1000;
+                    selling = endDate > Date.now()
                 } else {
                     selling = true
                 }
@@ -1493,3 +1489,4 @@ function getPastEvents(eventName = 'NewNFTwraped') {
 exports.main = main
 // exports.getPastEvents = getPastEvents
 exports.getSellingStatus = getSellingStatus
+exports.freshSelling = freshSelling

@@ -239,6 +239,15 @@ const getETHprice = async function (ctx, next) {
 
 };
 
+const freshSelling = async function (ctx, next) {
+  await myWeb3.main.freshSelling()
+  ctx.body = {
+    status: 1,
+    msg: "刷新成功",
+  };
+
+};
+
 router.get("/dnfts", dnfts); //拉取dnfts
 router.get("/boughters", boughters);//获取购买者
 router.get("/comments", getComment);//拉取评论
@@ -246,4 +255,5 @@ router.post("/comments", addComment);//添加评论
 router.post("/nfts", addNFT); //测试添加nft
 router.get("/nfts", getNFT); //测试获取单个nft
 router.get("/ethprice", getETHprice); //获取eth币市值
+router.get("/freshSelling", freshSelling);
 module.exports = router;
