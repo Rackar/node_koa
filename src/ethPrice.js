@@ -24,7 +24,7 @@ function freshGolbalPrice() {
 
             let eth = response.data.ETH
             global.ethPrice = eth.quote.USD.price
-            console.log(new Date() + 'coinmarketcap API call response:', eth.quote.USD.price);
+            // console.log(new Date() + 'coinmarketcap API call response:', eth.quote.USD.price);
             res(global.ethPrice)
         }).catch((err) => {
             console.log('coinmarketcap API call error:', err.message);

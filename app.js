@@ -11,6 +11,7 @@ const api = require("./routes/api");
 
 const jwt = require("koa-jwt");
 const config = require("./config/index");
+const log = require("./src/globalLog")()
 // error handler
 // onerror(app)
 
@@ -78,7 +79,7 @@ app.use(handler);
 app.use(async (ctx, next) => {
   const start = new Date();
   await next();
-  console.log(`  <-  ${ctx.method} start at ${start}`);
+  console.log(`   <-  ${ctx.method} start at ${start}`);
 });
 
 app.use(

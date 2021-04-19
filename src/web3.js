@@ -14,17 +14,17 @@ function refreshProvider(web3Obj, providerUrl) {
 
     function retry(event) {
         if (event) {
-            console.log('Web3 provider disconnected or errored.', event)
+            global.log('Web3 provider disconnected or errored. events :', event)
             retries += 1
 
             if (retries > 5) {
-                console.log(`Max retries of 5 exceeding: ${retries} times tried`)
+                global.log(`Max retries of 5 exceeding: ${retries} times tried`)
                 return setTimeout(refreshProvider, 5000)
             } else if (retries > 12 * 60 * 24) {
-                console.log(`Final Max retries of 5 exceeding: ${retries} times tried,exit.`)
+                global.log(`Final Max retries of 5 exceeding: ${retries} times tried,exit.`)
             }
         } else {
-            console.log(`Reconnecting web3 provider`)
+            global.log(`Reconnecting web3 provider`)
             refreshProvider(web3Obj, providerUrl)
         }
 
@@ -38,12 +38,18 @@ function refreshProvider(web3Obj, providerUrl) {
         }
     })
 
-    provider.on('end', () => retry())
-    provider.on('error', () => retry())
+    provider.on('end', () => {
+        global.log('provider end event happened.', new Date())
+        return retry()
+    })
+    provider.on('error', () => {
+        global.log('provider error event happened.', new Date())
+        return retry()
+    })
 
     web3Obj.setProvider(provider)
 
-    console.log('New Web3 provider initiated')
+    global.log('New Web3 provider initiated')
     current.myContract = new web3Obj.eth.Contract(ABI, address); //dnft
     listenEvents()
 
@@ -1224,7 +1230,7 @@ function getSellingStatus(dnftid) {
             })
             .catch((e) => {
                 resolve(false)
-                console.log(e);
+                global.log(e);
             });
     });
 }
@@ -1232,7 +1238,10 @@ function getSellingStatus(dnftid) {
 
 async function freshSelling() { //定时查找销售中的dnft是否销售完成
     let wrapres = await WrapEvents.find({ "returnValues.Selling": { "$not": /false/ } })
-    console.log('selling 状态未结束的数量为', wrapres.length)
+    if (wrapres.length) {
+        global.log('selling 状态未结束的数量为', wrapres.length)
+    }
+
     let changedArray = []
     for (let index = 0; index < wrapres.length; index++) {
         const wrap = wrapres[index];
@@ -1251,25 +1260,25 @@ async function freshSelling() { //定时查找销售中的dnft是否销售完成
                 $in: ids
             }
         }, { "$set": { "returnValues.Selling": "false" } })
-        console.log(new Date(), " refresh selling data ", JSON.stringify(result))
+        global.log(new Date(), " refresh selling data ", JSON.stringify(result))
     }
 
 }
 
 function listenEvents() {
-    console.log('begin listen events')
+    global.log('begin listen events')
     current.myContract.events.NewNFTwraped(
         {
 
         },
         async function (error, event) {
             if (error) {
-                console.log(error)
+                global.log(error)
             } else {
-                console.log("******wrap result:*******\n" + JSON.stringify(event));
+                global.log("******wrap result:*******\n" + JSON.stringify(event));
                 let wrap = new WrapEvents(event)
                 let result = await wrap.save();
-                console.log(result)
+                global.log(result)
             }
 
         }
@@ -1280,12 +1289,12 @@ function listenEvents() {
         },
         async function (error, event) {
             if (error) {
-                console.log(error)
+                global.log(error)
             } else {
-                console.log("******buy result:*******\n" + JSON.stringify(event));
+                global.log("******buy result:*******\n" + JSON.stringify(event));
                 let buy = new BuyEvents(event)
                 let result = await buy.save();
-                console.log(result)
+                global.log(result)
             }
         }
     );
@@ -1293,7 +1302,7 @@ function listenEvents() {
     //     //订阅
     // let subscription = web3.eth.subscribe('syncing', function (error, result) {
     //     if (!error) {
-    //         console.log("******syncing result:*******\n" + JSON.stringify(result));
+    //         global.log("******syncing result:*******\n" + JSON.stringify(result));
     //     }
 
     // });
@@ -1302,26 +1311,26 @@ function listenEvents() {
     //     topics: ['0x0df79c12', '0x167c576f']
     // }, function (error, result) {
     //     if (!error) {
-    //         console.log("******logs result:*******\n" + JSON.stringify(result));
+    //         global.log("******logs result:*******\n" + JSON.stringify(result));
     //     }
 
     // });
     // let subscription3 = web3.eth.subscribe('newBlockHeaders', function (error, result) {
     //     if (!error) {
-    //         console.log("******newBlockHeaders result:*******\n" + JSON.stringify(result));
+    //         global.log("******newBlockHeaders result:*******\n" + JSON.stringify(result));
     //     }
 
     // });
     // let subscription4 = web3.eth.subscribe('pendingTransactions', function (error, result) {
     //     if (!error) {
-    //         console.log("******pendingTransactions result:*******\n" + JSON.stringify(result));
+    //         global.log("******pendingTransactions result:*******\n" + JSON.stringify(result));
     //     }
 
     // });
     // // unsubscribes the subscription
     // subscription.unsubscribe(function(error, success){
     //     if(success)
-    //         console.log('Successfully unsubscribed!');
+    //         global.log('Successfully unsubscribed!');
     // });
 }
 
@@ -1330,7 +1339,7 @@ async function syncEvents() {
     let buyevents = await getPastEvents('dNFTbought')
     let wrapres = await WrapEvents.find()
     let buyres = await BuyEvents.find()
-    console.log(wrapevents.length, buyevents.length, wrapres.length, buyres.length)
+    global.log(wrapevents.length, buyevents.length, wrapres.length, buyres.length)
     let addWraps = []
     let addBuyers = []
     for (let index = 0; index < wrapevents.length; index++) {
@@ -1349,11 +1358,11 @@ async function syncEvents() {
     }
     if (addWraps.length) {
         let resW = await WrapEvents.insertMany(addWraps)
-        console.log("与链上同步，已添加上架数据：", resW.length, "条")
+        global.log("与链上同步，已添加上架数据：", resW.length, "条")
     }
     if (addBuyers.length) {
         let resB = await BuyEvents.insertMany(addBuyers)
-        console.log("与链上同步，已添加购买条数：", resB.length, "条")
+        global.log("与链上同步，已添加购买条数：", resB.length, "条")
     }
 }
 
@@ -1367,9 +1376,9 @@ async function main() {
     syncEvents()
     // setInterval(syncEvents, 3600000) //TODO 监听失效报错，暂时屏蔽
     await freshGolbalPrice()
-    console.log(global.ethPrice)
+    global.log("Init eth Price loop every 10 minutes: ", global.ethPrice)
     await freshSelling()
-
+    global.log("Selling status loop every 30 minutes")
     setInterval(freshGolbalPrice, 10 * 60 * 1000)
     setInterval(freshSelling, 30 * 60 * 1000)
 }
@@ -1390,7 +1399,7 @@ async function main() {
 
 //     let a = web3.eth.abi.encodeFunctionSignature('wrap(address,uint128)') //'0x0df79c12'
 //     let b = web3.eth.abi.encodeFunctionSignature('dNFTbuyer(uint256)') //'0x167c576f'
-//     console.log(a, b)
+//     global.log(a, b)
 
 //     const myContract = new web3.eth.Contract(ABI, address); //dnft
 //     // const myContract = new web3.eth.Contract(ABI_N, address_N); //nft
@@ -1407,29 +1416,29 @@ function init() {
 
 function uri(id) {
     return new Promise((resolve, reject) => {
-        console.log(current);
+        global.log(current);
         current.myContract.methods
             .uri(id)
             .call()
             .then(function (result) {
-                console.log('uri: ' + JSON.stringify(result));
+                global.log('uri: ' + JSON.stringify(result));
                 resolve(result);
             })
-            .catch((e) => console.log(e));
+            .catch((e) => global.log(e));
     });
 }
 
 function tokenUri(id) {
     return new Promise((resolve, reject) => {
-        console.log(current);
+        global.log(current);
         current.myContract.methods
             .tokenURI(id)
             .call()
             .then(function (result) {
-                console.log('token uri: ' + JSON.stringify(result));
+                global.log('token uri: ' + JSON.stringify(result));
                 resolve(result);
             })
-            .catch((e) => console.log(e));
+            .catch((e) => global.log(e));
     });
 }
 // getPastEvents()
@@ -1437,11 +1446,11 @@ function tokenUri(id) {
 function getPastEvents(eventName = 'NewNFTwraped') {
     // current.myContract = init()
     return new Promise((resolve, reject) => {
-        // console.log(current);
+        // global.log(current);
         current.myContract
             .getPastEvents(eventName, { fromBlock: 0, toBlock: 'latest' })
             .then(function (result) {
-                // console.log('events: ' + JSON.stringify(result));
+                // global.log('events: ' + JSON.stringify(result));
                 resolve(result);
                 let events = [
                     // {
@@ -1482,7 +1491,7 @@ function getPastEvents(eventName = 'NewNFTwraped') {
 
                 let NFTlist = events.map((res) => res.returnValues);
             })
-            .catch((e) => console.log(e));
+            .catch((e) => global.log(e));
     });
 }
 
