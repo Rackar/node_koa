@@ -79,7 +79,7 @@ app.use(handler);
 app.use(async (ctx, next) => {
   const start = new Date();
   await next();
-  console.log(`   <-  ${ctx.method} start at ${start}`);
+  console.log(`   -- ${ctx.method} start at ${start}`);
 });
 
 app.use(
