@@ -17,14 +17,18 @@ function refreshProvider(web3Obj, providerUrl) {
             global.log('Web3 provider disconnected or errored. events :', event)
             retries += 1
 
-            if (retries > 5) {
-                global.log(`Max retries of 5 exceeding: ${retries} times tried`)
+            if (retries < 5) {
+                global.log(` ${retries} times tried`)
                 return setTimeout(refreshProvider, 5000)
-            } else if (retries > 12 * 60 * 24) {
-                global.log(`Final Max retries of 5 exceeding: ${retries} times tried,exit.`)
+            } else if (retries < 50) {
+                global.log(`More than 5 times retries: ${retries} times tried.`)
+                return setTimeout(refreshProvider, 20000)
+            } else {
+                global.log(`Max retries Ended: ${retries} times tried, exit.`)
+                retries = 0
             }
         } else {
-            global.log(`Reconnecting web3 provider`)
+            global.log(`Reconnecting web3 provider, no retry event`)
             refreshProvider(web3Obj, providerUrl)
         }
 
@@ -40,7 +44,7 @@ function refreshProvider(web3Obj, providerUrl) {
 
     provider.on('end', () => {
         global.log('provider end event happened.', new Date())
-        return retry()
+        // return retry()
     })
     provider.on('error', () => {
         global.log('provider error event happened.', new Date())
@@ -1273,7 +1277,7 @@ function listenEvents() {
         },
         async function (error, event) {
             if (error) {
-                global.log(error)
+                global.log(error.toString())
             } else {
                 global.log("******wrap result:*******\n" + JSON.stringify(event));
                 let wrap = new WrapEvents(event)
@@ -1289,7 +1293,7 @@ function listenEvents() {
         },
         async function (error, event) {
             if (error) {
-                global.log(error)
+                global.log(error.toString())
             } else {
                 global.log("******buy result:*******\n" + JSON.stringify(event));
                 let buy = new BuyEvents(event)
