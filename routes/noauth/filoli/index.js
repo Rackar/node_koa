@@ -145,6 +145,20 @@ async function findMetaWithDNFTid(dNFTid) {
     return {}
 
 }
+async function findMyOwnDNFT(ctx, next) {
+  let uad = ctx.query.uad;
+
+  let ownDNFTs = await WrapEvents.find(
+    { "returnValues.Principal": web3.utils.toChecksumAddress(uad) },
+  );
+  let dnfts = ownDNFTs.filter(dnft => dnft.ownerClaimed !== "true").map(dnft => dnft.returnValues.dNFTid)
+  ctx.body = {
+    status: 1,
+    msg: "已获取我上架的dnft列表",
+    data: dnfts || []
+  };
+}
+
 const boughters = async function (ctx, next) {
   let id = ctx.query.id;
   let uad = ctx.query.uad;
@@ -248,8 +262,33 @@ const freshSelling = async function (ctx, next) {
 
 };
 
+const ownclaim = async function (ctx, next) {
+  let dnftid = ctx.request.body.dnftid;
+  let result = await WrapEvents.updateOne(
+    {
+      "returnValues.dNFTid": dnftid,
+    },
+    {
+      ownerClaimed: "true"
+    }
+  );
+  if (result) {
+    ctx.body = {
+      status: 1,
+      msg: "修改成功"
+    };
+  } else {
+    ctx.body = {
+      status: 0,
+      msg: "修改失败"
+    };
+  }
+};
+
 router.get("/dnfts", dnfts); //拉取dnfts
+router.get("/mydnfts", findMyOwnDNFT); //拉取我上架的dnfts
 router.get("/boughters", boughters);//获取购买者
+router.post("/ownclaim", ownclaim);//修改提取信息
 router.get("/comments", getComment);//拉取评论
 router.post("/comments", addComment);//添加评论
 router.post("/nfts", addNFT); //测试添加nft

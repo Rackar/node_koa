@@ -14,6 +14,10 @@ var WrapSchema = new Schema({
             type: String,
             default: "true"
         }
+    },
+    ownerClaimed: {
+        type: String,
+        default: "false"
     }
 }, { strict: false, timestamps: true });
 module.exports = mongoose.model("Wrap", WrapSchema);
