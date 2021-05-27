@@ -45,7 +45,9 @@ const getComment = async function (ctx, next) {
 };
 const dnfts = async function (ctx, next) {
   let uad = ctx.query.uad;
-  let query = {}
+  let query = {
+    address: myWeb3.address
+  }
   if (uad) {
     query["returnValues.Principal"] = web3.utils.toChecksumAddress(uad)
   }
@@ -91,6 +93,7 @@ const dnfts = async function (ctx, next) {
 const sellingDnfts = async function (ctx, next) {
   let uad = ctx.query.uad;
   let query = {
+    address: myWeb3.address,
     Selling: true
   }
   if (uad) {
@@ -137,7 +140,7 @@ const sellingDnfts = async function (ctx, next) {
 };
 
 async function findMetaWithDNFTid(dNFTid) {
-  let res = await WrapEvents.findOne({ "returnValues.dNFTid": dNFTid })
+  let res = await WrapEvents.findOne({ address: myWeb3.address, "returnValues.dNFTid": dNFTid })
   let meta = await NFT.findOne({ nftid: res.returnValues.NFTid })
   if (meta && meta.name)
     return meta
@@ -149,7 +152,7 @@ async function findMyOwnDNFT(ctx, next) {
   let uad = ctx.query.uad;
 
   let ownDNFTs = await WrapEvents.find(
-    { "returnValues.Principal": web3.utils.toChecksumAddress(uad) },
+    { address: myWeb3.address, "returnValues.Principal": web3.utils.toChecksumAddress(uad) },
   );
   let dnfts = ownDNFTs.filter(dnft => dnft.ownerClaimed !== "true").map(dnft => dnft.returnValues.dNFTid)
   ctx.body = {
@@ -162,7 +165,9 @@ async function findMyOwnDNFT(ctx, next) {
 const boughters = async function (ctx, next) {
   let id = ctx.query.id;
   let uad = ctx.query.uad;
-  let query = {}
+  let query = {
+    address: myWeb3.address
+  }
   if (id) {
     query["returnValues.dNFTid"] = id
   }
@@ -266,6 +271,7 @@ const ownclaim = async function (ctx, next) {
   let dnftid = ctx.request.body.dnftid;
   let result = await WrapEvents.updateOne(
     {
+      address: myWeb3.address,
       "returnValues.dNFTid": dnftid,
     },
     {
