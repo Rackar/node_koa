@@ -6,60 +6,6 @@ const ObjectID = require("mongodb").ObjectID;
 
 const web3 = new Web3()
 
-/**
- * Refreshes provider instance and attaches even handlers to it
- */
-function refreshProvider(web3Obj, providerUrl) {
-    let retries = 0
-
-    function retry(event) {
-        if (event) {
-            global.log('Web3 provider disconnected or errored. events :', event)
-            retries += 1
-
-            if (retries < 5) {
-                global.log(` ${retries} times tried`)
-                return setTimeout(refreshProvider, 5000)
-            } else if (retries < 50) {
-                global.log(`More than 5 times retries: ${retries} times tried.`)
-                return setTimeout(refreshProvider, 20000)
-            } else {
-                global.log(`Max retries Ended: ${retries} times tried, exit.`)
-                retries = 0
-            }
-        } else {
-            global.log(`Reconnecting web3 provider, no retry event`)
-            refreshProvider(web3Obj, providerUrl)
-        }
-
-        return null
-    }
-
-    const provider = new Web3.providers.WebsocketProvider(providerUrl, {
-        clientConfig: {
-            keepalive: true,
-            keepaliveInterval: 60000	// milliseconds
-        }
-    })
-
-    provider.on('end', () => {
-        global.log('provider end event happened.', new Date())
-        // return retry()
-    })
-    provider.on('error', () => {
-        global.log('provider error event happened.', new Date())
-        return retry()
-    })
-
-    web3Obj.setProvider(provider)
-
-    global.log('New Web3 provider initiated')
-    current.myContract = new web3Obj.eth.Contract(ABI, address); //dnft
-    listenEvents()
-
-    return provider
-}
-
 const myAddress = "0x65D17D3dC59b5ce3d4CE010eB1719882b3f10490"
 
 // let address = "0xD49091863732A03901e46074127Fd04e15080572" //0312 kovan添加event
@@ -772,6 +718,61 @@ let ABI = [
 ]
 
 let current = {}
+
+
+/**
+ * Refreshes provider instance and attaches even handlers to it
+ */
+ function refreshProvider(web3Obj, providerUrl) {
+    let retries = 0
+
+    function retry(event) {
+        if (event) {
+            global.log('Web3 provider disconnected or errored. events :', event)
+            retries += 1
+
+            if (retries < 5) {
+                global.log(` ${retries} times tried`)
+                return setTimeout(refreshProvider, 5000)
+            } else if (retries < 50) {
+                global.log(`More than 5 times retries: ${retries} times tried.`)
+                return setTimeout(refreshProvider, 20000)
+            } else {
+                global.log(`Max retries Ended: ${retries} times tried, exit.`)
+                retries = 0
+            }
+        } else {
+            global.log(`Reconnecting web3 provider, no retry event`)
+            refreshProvider(web3Obj, providerUrl)
+        }
+
+        return null
+    }
+
+    const provider = new Web3.providers.WebsocketProvider(providerUrl, {
+        clientConfig: {
+            keepalive: true,
+            keepaliveInterval: 60000	// milliseconds
+        }
+    })
+
+    provider.on('end', () => {
+        global.log('provider end event happened.', new Date())
+        // return retry()
+    })
+    provider.on('error', () => {
+        global.log('provider error event happened.', new Date())
+        return retry()
+    })
+
+    web3Obj.setProvider(provider)
+
+    global.log('New Web3 provider initiated')
+    current.myContract = new web3Obj.eth.Contract(ABI, address); //dnft
+    listenEvents()
+
+    return provider
+}
 
 function getSellingStatus(dnftid) {
     let myContract = current.myContract || init()
