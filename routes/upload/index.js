@@ -1,29 +1,41 @@
 const router = require("koa-router")();
 const multer = require("koa-multer");
 
-router.prefix("/upload");
+// router.prefix("/upload");
 
 const storage = multer.diskStorage({
-  destination: function(req, file, cb) {
+  destination: function (req, file, cb) {
     cb(null, "uploads/");
   },
-  filename: function(req, file, cb) {
+  filename: function (req, file, cb) {
     cb(null, file.fieldname + "-" + Date.now() + file.originalname);
   }
 });
 const upload = multer({ storage: storage });
 
-router.post("/image", upload.single("avatar"), function(ctx, next) {
-  let data = {
-    path: ctx.req.file.path,
-    filename: ctx.req.file.filename,
-    contentType: ctx.req.file.mimetype
-  };
+router.post("/image", upload.single("file"), function (ctx, next) {
+  let data = null, msg = '', status = 0
+  let params = {}
+  if (ctx.req.file) {
+    data = {
+      path: ctx.req.file.path,
+      filename: ctx.req.file.filename,
+      contentType: ctx.req.file.mimetype
+    };
+    params = ctx.req.body
+    console.log(params, data)
+    msg = "图片上传成功"
+    status = 1
+  } else {
+    msg = "请使用POST方式form-data方式上传,文件key为file"
+    status = 0
+  }
+
 
   ctx.body = {
-    status: 1,
-    msg: "上传图片成功",
-    data: data
+    status,
+    msg,
+    data
   };
 });
 

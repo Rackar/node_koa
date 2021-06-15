@@ -7,7 +7,6 @@ const bodyparser = require("koa-bodyparser");
 const logger = require("koa-logger");
 
 const noauth = require("./routes/noAuth");
-const api = require("./routes/api");
 
 const jwt = require("koa-jwt");
 const config = require("./config/index");
@@ -82,16 +81,15 @@ app.use(async (ctx, next) => {
   console.log(`${ctx.method} ${ctx.url} - ${ms}ms`);
 });
 
-app.use(
-  jwt({ secret: config.jwtsecret }).unless({
-    path: [/^\/noauth/, /^\/api\/lianyue/]
-    // path: [/^\/public/, /^\/uploads/, /^\/noauth/]
-  })
-);
+// app.use(
+//   jwt({ secret: config.jwtsecret }).unless({
+//     path: [/^\/noauth/, /^\/api\/lianyue/]
+//     // path: [/^\/public/, /^\/uploads/, /^\/noauth/]
+//   })
+// );
 
 // routes
 app.use(noauth.routes(), noauth.allowedMethods());
-app.use(api.routes(), api.allowedMethods());
 
 // // error-handling
 // app.on('error', (err, ctx) => {
