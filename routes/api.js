@@ -1,11 +1,12 @@
+const WrapEvents = require("../../../models/WrapEvents");
+const NFT = require("../../../models/NFT");
 const multer = require("koa-multer");
 
 const router = require("koa-router")();
 const person = require("./api/person/index");
 const star = require("./api/star/index");
 const cards = require("./api/cardManage/index");
-const lianyue = require("./noauth/lianyue/addArticle");
-const Article = require("../models/article");
+
 router.prefix("/api");
 
 var storage = multer.diskStorage({
@@ -49,8 +50,16 @@ var addLink = async function (ctx, next) {
   }
 };
 
-router.post("/lianyue", addLink);
+function dnftMeta() {
+  let dnftid = ctx.params.dnftid;
+        let res = await WrapEvents.findOne({ "returnValues.dNFTid": dnftid })
+      let meta = await NFT.findOne({ nftid: res.returnValues.NFTid })
+      ctx.body = meta || {}
+}
 
+
+router.post("/lianyue", addLink);
+router.get("/meta/:dnftid", dnftMeta);
 router.use(person.routes(), person.allowedMethods()); // /person
 router.use(star.routes(), star.allowedMethods()); // /stars
 router.use(cards.routes(), cards.allowedMethods()); // /stars
