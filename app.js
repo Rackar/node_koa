@@ -82,12 +82,12 @@ app.use(async (ctx, next) => {
   console.log(`   -- ${ctx.method} start at ${start}`);
 });
 
-app.use(
-  jwt({ secret: config.jwtsecret }).unless({
-    path: [/^\/noauth/, /^\/api\/lianyue/]
-    // path: [/^\/public/, /^\/uploads/, /^\/noauth/]
-  })
-);
+// app.use(
+//   jwt({ secret: config.jwtsecret }).unless({
+//     path: [/^\/noauth/, /^\/api\/lianyue/]
+//     // path: [/^\/public/, /^\/uploads/, /^\/noauth/]
+//   })
+// );
 
 // routes
 app.use(noauth.routes(), noauth.allowedMethods());
