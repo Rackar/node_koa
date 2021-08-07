@@ -1,5 +1,5 @@
-const WrapEvents = require("../../../models/WrapEvents");
-const NFT = require("../../../models/NFT");
+const WrapEvents = require("../models/WrapEvents");
+const NFT = require("../models/NFT");
 const multer = require("koa-multer");
 
 const router = require("koa-router")();
@@ -50,13 +50,12 @@ var addLink = async function (ctx, next) {
   }
 };
 
-function dnftMeta() {
+async function dnftMeta(ctx, next) {
   let dnftid = ctx.params.dnftid;
-        let res = await WrapEvents.findOne({ "returnValues.dNFTid": dnftid })
-      let meta = await NFT.findOne({ nftid: res.returnValues.NFTid })
-      ctx.body = meta || {}
+  let res = await WrapEvents.findOne({ "returnValues.dNFTid": dnftid });
+  let meta = await NFT.findOne({ nftid: res.returnValues.NFTid });
+  ctx.body = meta || {};
 }
-
 
 router.post("/lianyue", addLink);
 router.get("/meta/:dnftid", dnftMeta);
