@@ -1,91 +1,88 @@
 const router = require("koa-router")();
-const web3 = require('web3');
+const web3 = require("web3");
 const BuyEvents = require("../../../models/BuyEvents");
 const WrapEvents = require("../../../models/WrapEvents");
 const Comment = require("../../../models/Comment");
 const NFT = require("../../../models/NFT");
-let myWeb3 = require('../../../src/web3')
+let myWeb3 = require("../../../src/web3");
 router.prefix("/filoli");
 const addComment = async function (ctx, next) {
   // res.send('respond with a resource');
   let comment = ctx.request.body.comment;
-  let CommentModel = new Comment(comment)
+  let CommentModel = new Comment(comment);
 
-  let result = await CommentModel.save()
+  let result = await CommentModel.save();
   if (result) {
     ctx.body = {
       status: 1,
-      msg: "增加成功"
+      msg: "增加成功",
     };
   } else {
     ctx.body = {
       status: 0,
-      msg: "增加失败"
+      msg: "增加失败",
     };
   }
 };
 const getComment = async function (ctx, next) {
   let id = ctx.query.id;
-  let comments = await Comment.find(
-    { dNFTid: id },
-  );
+  let comments = await Comment.find({ dNFTid: id });
   if (comments && comments.length) {
     ctx.body = {
       status: 1,
       msg: "已获取所有评论",
-      data: comments
+      data: comments,
     };
   } else {
     ctx.body = {
       status: 0,
       msg: "无数据",
-      data: []
+      data: [],
     };
   }
 };
 const dnfts = async function (ctx, next) {
   let uad = ctx.query.uad;
   let query = {
-    address: myWeb3.address
-  }
+    address: myWeb3.address,
+  };
   if (uad) {
-    query["returnValues.Principal"] = web3.utils.toChecksumAddress(uad)
+    query["returnValues.Principal"] = web3.utils.toChecksumAddress(uad);
   }
   let dnfts = await WrapEvents.find(query);
   if (dnfts && dnfts.length) {
-    let list = dnfts.map(de => {
+    let list = dnfts.map((de) => {
       return {
         NFTCotract: de.returnValues.NFTCotract,
         NFTid: de.returnValues.NFTid,
         dNFTid: de.returnValues.dNFTid,
         Principal: de.returnValues.Principal,
         Selling: de.returnValues.Selling,
-        updatedAt: de.updatedAt
-      }
-    })
-    let nftIds = list.map(de => de.NFTid)
+        updatedAt: de.updatedAt,
+      };
+    });
+    let nftIds = list.map((de) => de.NFTid);
     let nftMetas = await NFT.find({ nftid: { $in: nftIds } });
 
-    let newList = list.map(el => {
-      let obj = nftMetas.find(item => item.nftid == el.NFTid)
+    let newList = list.map((el) => {
+      let obj = nftMetas.find((item) => item.nftid == el.NFTid);
       if (obj) {
-        el.name = obj.name
-        el.description = obj.description
-        el.image = obj.image
+        el.name = obj.name;
+        el.description = obj.description;
+        el.image = obj.image;
       }
-      return el
-
-    })
+      return el;
+    });
     ctx.body = {
       status: 1,
       msg: "已获取所有dNFT",
-      data: newList
+      data: newList,
     };
   } else {
     ctx.body = {
       status: 0,
       msg: "无数据",
-      data: []
+      data: [],
     };
   }
 };
@@ -94,71 +91,75 @@ const sellingDnfts = async function (ctx, next) {
   let uad = ctx.query.uad;
   let query = {
     address: myWeb3.address,
-    Selling: true
-  }
+    Selling: true,
+  };
   if (uad) {
     query["returnValues.Principal"] = web3.utils.toChecksumAddress(uad);
   }
   let dnfts = await WrapEvents.find(query);
   if (dnfts && dnfts.length) {
-    let list = dnfts.map(async de => {
-      let sell = await myWeb3.getSellingStatus(de.returnValues.dNFTid)
-      return {
-        NFTCotract: de.returnValues.NFTCotract,
-        NFTid: de.returnValues.NFTid,
-        dNFTid: de.returnValues.dNFTid,
-        Principal: de.returnValues.Principal,
-        updatedAt: de.updatedAt,
-        selling: sell
-      }
-    }).filter(dnft => dnft.selling === true)
-    let nftIds = list.map(de => de.NFTid)
+    let list = dnfts
+      .map(async (de) => {
+        let sell = await myWeb3.getSellingStatus(de.returnValues.dNFTid);
+        return {
+          NFTCotract: de.returnValues.NFTCotract,
+          NFTid: de.returnValues.NFTid,
+          dNFTid: de.returnValues.dNFTid,
+          Principal: de.returnValues.Principal,
+          updatedAt: de.updatedAt,
+          selling: sell,
+        };
+      })
+      .filter((dnft) => dnft.selling === true);
+    let nftIds = list.map((de) => de.NFTid);
     let nftMetas = await NFT.find({ nftid: { $in: nftIds } });
 
-    let newList = list.map(el => {
-      let obj = nftMetas.find(item => item.nftid == el.NFTid)
+    let newList = list.map((el) => {
+      let obj = nftMetas.find((item) => item.nftid == el.NFTid);
       if (obj) {
-        el.name = obj.name
-        el.description = obj.description
-        el.image = obj.image
+        el.name = obj.name;
+        el.description = obj.description;
+        el.image = obj.image;
       }
-      return el
-
-    })
+      return el;
+    });
     ctx.body = {
       status: 1,
       msg: "已获取所有dNFT",
-      data: newList
+      data: newList,
     };
   } else {
     ctx.body = {
       status: 0,
       msg: "无数据",
-      data: []
+      data: [],
     };
   }
 };
 
 async function findMetaWithDNFTid(dNFTid) {
-  let res = await WrapEvents.findOne({ address: myWeb3.address, "returnValues.dNFTid": dNFTid })
-  let meta = await NFT.findOne({ nftid: res.returnValues.NFTid })
-  if (meta && meta.name)
-    return meta
-  else
-    return {}
-
+  let res = await WrapEvents.findOne({
+    address: myWeb3.address,
+    "returnValues.dNFTid": dNFTid,
+  });
+  let meta = await NFT.findOne({ nftid: res.returnValues.NFTid });
+  if (meta && meta.name) return meta;
+  else return {};
 }
 async function findMyOwnDNFT(ctx, next) {
   let uad = ctx.query.uad;
 
-  let ownDNFTs = await WrapEvents.find(
-    { address: myWeb3.address, "returnValues.Principal": web3.utils.toChecksumAddress(uad) },
-  );
-  let dnfts = ownDNFTs.filter(dnft => dnft.ownerClaimed !== "true").map(dnft => dnft.returnValues.dNFTid)
+  let ownDNFTs = await WrapEvents.find({
+    address: myWeb3.address,
+    "returnValues.Principal": web3.utils.toChecksumAddress(uad),
+  });
+  let dnfts = ownDNFTs
+    .filter((dnft) => dnft.ownerClaimed !== "true")
+    .map((dnft) => dnft.returnValues.dNFTid);
   ctx.body = {
     status: 1,
     msg: "已获取我上架的dnft列表",
-    data: dnfts || []
+    data: dnfts || [],
   };
 }
 
@@ -166,29 +167,29 @@ const boughters = async function (ctx, next) {
   let id = ctx.query.id;
   let uad = ctx.query.uad;
   let query = {
-    address: myWeb3.address
-  }
+    address: myWeb3.address,
+  };
   if (id) {
-    query["returnValues.dNFTid"] = id
+    query["returnValues.dNFTid"] = id;
   }
   if (uad) {
-    query["returnValues.Buyer"] = web3.utils.toChecksumAddress(uad)
+    query["returnValues.Buyer"] = web3.utils.toChecksumAddress(uad);
   }
   let buyer = await BuyEvents.find(
-    query,
+    query
     // {
     //   "returnValues.$": 1
     // }
   );
   if (buyer && buyer.length) {
-    let list = buyer.map(de => {
+    let list = buyer.map((de) => {
       return {
         Buyer: de.returnValues.Buyer,
         dNFTid: de.returnValues.dNFTid,
         amount: de.returnValues.amount,
-        updatedAt: de.updatedAt
-      }
-    })
+        updatedAt: de.updatedAt,
+      };
+    });
 
     //后端查NFT名称，不太必要
     // for (let i = 0; i < list.length; i++) {
@@ -201,70 +202,66 @@ const boughters = async function (ctx, next) {
     ctx.body = {
       status: 1,
       msg: "已获取所有交易记录",
-      data: list
+      data: list,
     };
   } else {
     ctx.body = {
       status: 0,
       msg: "无数据",
-      data: []
+      data: [],
     };
   }
 };
 const addNFT = async function (ctx, next) {
   let nft = ctx.request.body.nft;
-  let NFTModel = new NFT(nft)
+  let NFTModel = new NFT(nft);
 
-  let result = await NFTModel.save()
+  let result = await NFTModel.save();
   if (result) {
     ctx.body = {
       status: 1,
-      msg: "增加成功"
+      msg: "增加成功",
     };
   } else {
     ctx.body = {
       status: 0,
-      msg: "增加失败"
+      msg: "增加失败",
     };
   }
 };
 const getNFT = async function (ctx, next) {
   let id = ctx.query.id;
 
-  let result = await NFT.findOne(
-    { nftid: id },
-  );
+  let result = await NFT.findOne({ nftid: id });
   if (result) {
     ctx.body = {
       status: 1,
       msg: "查询成功",
-      data: result
+      data: result,
     };
   } else {
     ctx.body = {
       status: 0,
-      msg: "查询失败"
+      msg: "查询失败",
     };
   }
 };
 
 const getETHprice = async function (ctx, next) {
-  let price = global.ethPrice
+  let price = global.ethPrice;
   ctx.body = {
     status: 1,
     msg: "查询成功",
-    data: price
+    data: price,
   };
-
 };
 
 const freshSelling = async function (ctx, next) {
-  await myWeb3.main.freshSelling()
+  await myWeb3.main.freshSelling();
   ctx.body = {
     status: 1,
     msg: "刷新成功",
   };
-
 };
 
 const ownclaim = async function (ctx, next) {
@@ -275,30 +272,49 @@ const ownclaim = async function (ctx, next) {
       "returnValues.dNFTid": dnftid,
     },
     {
-      ownerClaimed: "true"
+      ownerClaimed: "true",
     }
   );
   if (result) {
     ctx.body = {
       status: 1,
-      msg: "修改成功"
+      msg: "修改成功",
     };
   } else {
     ctx.body = {
       status: 0,
-      msg: "修改失败"
+      msg: "修改失败",
     };
   }
 };
 
+const refreshEvents = async function (ctx, next) {
+  let type = ctx.request.query.type;
+  let result = await myWeb3.refreshEvents(type);
+
+  if (result) {
+    ctx.body = {
+      status: 1,
+      msg: "刷新成功",
+    };
+  } else {
+    ctx.body = {
+      status: 0,
+      msg: "刷新失败",
+    };
+  }
+  refreshEvents;
+};
+
 router.get("/dnfts", dnfts); //拉取dnfts
 router.get("/mydnfts", findMyOwnDNFT); //拉取我上架的dnfts
-router.get("/boughters", boughters);//获取购买者
-router.post("/ownclaim", ownclaim);//修改提取信息
-router.get("/comments", getComment);//拉取评论
-router.post("/comments", addComment);//添加评论
+router.get("/boughters", boughters); //获取购买者
+router.post("/ownclaim", ownclaim); //修改提取信息
+router.get("/comments", getComment); //拉取评论
+router.post("/comments", addComment); //添加评论
 router.post("/nfts", addNFT); //测试添加nft
 router.get("/nfts", getNFT); //测试获取单个nft
 router.get("/ethprice", getETHprice); //获取eth币市值
-router.get("/freshSelling", freshSelling);
+router.get("/freshSelling", freshSelling); //刷新购买结束与否的状态
+router.get("/refreshEvents", refreshEvents); // 手动刷新链上信息
 module.exports = router;

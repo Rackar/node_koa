@@ -4,11 +4,17 @@ const BuyEvents = require("../models/BuyEvents");
 const freshGolbalPrice = require("./ethPrice");
 const ObjectID = require("mongodb").ObjectID;
 
+const CONFIG = {
+  ankr: "wss://apis-sj.ankr.com/wss/05399538cead48c7942edd4ed0f9fe49/00605b1b0a631ff48b7d026f5bd7841d/binance/full/main",
+  infura: "wss://kovan.infura.io/ws/v3/bd6e30f7beaf4dc9ad34adf9792bd509",
+};
+
 const web3 = new Web3();
 
 const myAddress = "0x65D17D3dC59b5ce3d4CE010eB1719882b3f10490";
 
 // let address = "0xD49091863732A03901e46074127Fd04e15080572" //0312 kovan添加event
+// DNFT ad ABI
 let address = "0x6ebe3D44d6FCED5b59879CbeE9fd01969eE4fC63"; //0702 kovan添加
 let ABI = [
   {
@@ -771,7 +777,7 @@ let current = {};
 function refreshProvider(web3Obj, providerUrl) {
   let retries = 0;
 
-  function retry(event) {
+  async function retry(event) {
     if (event) {
       global.log("Web3 provider disconnected or errored. events :", event);
       retries += 1;
@@ -881,28 +887,49 @@ async function freshSelling() {
   }
 }
 
-function listenEvents() {
+async function refreshEvents(type) {
+  let blockNumber = await getBlockNumber();
+  if (type === "NewNFTwraped") {
+    let result = await refreshWrapEvents(blockNumber);
+    return result;
+  } else if (type === "dNFTbought") {
+    let result = await refreshBuyEvents(blockNumber);
+    return result;
+  } else {
+    return null;
+  }
+}
+
+async function listenEvents() {
+  let blockNumber = await getBlockNumber();
+
   global.log("begin listen events");
-  current.myContract.events.NewNFTwraped({}, async function (error, event) {
-    if (error) {
-      global.log(error.toString());
-    } else {
-      global.log("******wrap result:*******\n" + JSON.stringify(event));
-      let wrap = new WrapEvents(event);
-      let result = await wrap.save();
-      global.log(result);
+  current.myContract.events.NewNFTwraped(
+    { fromBlock: blockNumber - 1900 },
+    async function (error, event) {
+      if (error) {
+        global.log(error.toString());
+      } else {
+        global.log("******wrap result:*******\n" + JSON.stringify(event));
+        let wrap = new WrapEvents(event);
+        let result = await wrap.save();
+        global.log(result);
+      }
     }
-  });
-  current.myContract.events.dNFTbought({}, async function (error, event) {
-    if (error) {
-      global.log(error.toString());
-    } else {
-      global.log("******buy result:*******\n" + JSON.stringify(event));
-      let buy = new BuyEvents(event);
-      let result = await buy.save();
-      global.log(result);
+  );
+  current.myContract.events.dNFTbought(
+    { fromBlock: blockNumber - 1900 },
+    async function (error, event) {
+      if (error) {
+        global.log(error.toString());
+      } else {
+        global.log("******buy result:*******\n" + JSON.stringify(event));
+        let buy = new BuyEvents(event);
+        let result = await buy.save();
+        global.log(result);
+      }
     }
-  });
+  );
 
   //     //订阅
   // let subscription = web3.eth.subscribe('syncing', function (error, result) {
@@ -939,19 +966,11 @@ function listenEvents() {
   // });
 }
 
-async function syncEvents() {
-  let wrapevents = await getPastEvents("NewNFTwraped");
-  let buyevents = await getPastEvents("dNFTbought");
+async function refreshWrapEvents(blockNumber) {
+  let wrapevents = await getPastEvents("NewNFTwraped", blockNumber);
   let wrapres = await WrapEvents.find({ address });
-  let buyres = await BuyEvents.find({ address });
-  global.log(
-    wrapevents.length,
-    buyevents.length,
-    wrapres.length,
-    buyres.length
-  );
+  global.log(wrapevents.length, wrapres.length);
   let addWraps = [];
-  let addBuyers = [];
   for (let index = 0; index < wrapevents.length; index++) {
     const wrap = wrapevents[index];
     let exist = wrapres.some((w) => w.transactionHash === wrap.transactionHash);
@@ -959,6 +978,22 @@ async function syncEvents() {
       addWraps.push(wrap);
     }
   }
+
+  if (addWraps.length) {
+    let resW = await WrapEvents.insertMany(addWraps);
+    global.log("与链上同步，已添加上架数据：", resW.length, "条");
+    return resW;
+  } else {
+    return null;
+  }
+}
+
+async function refreshBuyEvents(blockNumber) {
+  let buyevents = await getPastEvents("dNFTbought", blockNumber);
+  let buyres = await BuyEvents.find({ address });
+  global.log(buyevents.length, buyres.length);
+  let addBuyers = [];
+
   for (let index = 0; index < buyevents.length; index++) {
     const buyer = buyevents[index];
     let exist = buyres.some((b) => b.transactionHash === buyer.transactionHash);
@@ -966,14 +1001,29 @@ async function syncEvents() {
       addBuyers.push(buyer);
     }
   }
-  if (addWraps.length) {
-    let resW = await WrapEvents.insertMany(addWraps);
-    global.log("与链上同步，已添加上架数据：", resW.length, "条");
-  }
+
   if (addBuyers.length) {
     let resB = await BuyEvents.insertMany(addBuyers);
     global.log("与链上同步，已添加购买条数：", resB.length, "条");
+    return resB;
+  } else {
+    return null;
   }
+}
+async function syncEvents() {
+  let blockNumber = await getBlockNumber();
+  refreshWrapEvents(blockNumber);
+  refreshBuyEvents(blockNumber);
+}
+function getBlockNumber() {
+  return new Promise((resolve, reject) => {
+    web3.eth.getBlockNumber().then(function (result) {
+      console.log("blockNumber:" + result);
+      resolve(result);
+    });
+  }).catch((err) => {
+    reject(err);
+  });
 }
 
 async function main() {
@@ -991,7 +1041,7 @@ async function main() {
   setInterval(freshGolbalPrice, 10 * 60 * 1000);
   setInterval(freshSelling, 30 * 60 * 1000);
 }
-// main()
+// main();
 
 // function init() {
 //     const options = {
@@ -1016,10 +1066,7 @@ async function main() {
 // }
 
 function init() {
-  refreshProvider(
-    web3,
-    "wss://kovan.infura.io/ws/v3/bd6e30f7beaf4dc9ad34adf9792bd509"
-  );
+  refreshProvider(web3, CONFIG.ankr);
   web3.eth.defaultAccount = myAddress;
   const myContract = new web3.eth.Contract(ABI, address); //dnft
   return myContract;
@@ -1054,12 +1101,15 @@ function tokenUri(id) {
 }
 // getPastEvents()
 
-function getPastEvents(eventName = "NewNFTwraped") {
+function getPastEvents(eventName = "NewNFTwraped", blockNumber) {
   // current.myContract = init()
   return new Promise((resolve, reject) => {
     // global.log(current);
     current.myContract
-      .getPastEvents(eventName, { fromBlock: 0, toBlock: "latest" })
+      .getPastEvents(eventName, {
+        fromBlock: blockNumber - 1900 || 0,
+        toBlock: "latest",
+      })
       .then(function (result) {
         // global.log('events: ' + JSON.stringify(result));
         resolve(result);
@@ -1111,3 +1161,4 @@ exports.main = main;
 exports.getSellingStatus = getSellingStatus;
 exports.freshSelling = freshSelling;
 exports.address = address;
+exports.refreshEvents = refreshEvents;
