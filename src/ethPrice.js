@@ -8,7 +8,7 @@ const requestOptions = {
         // 'start': '1',
         // 'limit': '5000',
         'convert': 'USD',
-        'symbol': 'BTC,ETH'
+        'symbol': 'BTC,ETH,BNB'
     },
     headers: {
         'X-CMC_PRO_API_KEY': '25dac9be-cd69-434c-b51a-96e4e5a56d15'
@@ -22,7 +22,8 @@ function freshGolbalPrice() {
     return new Promise((res, rej) => {
         rp(requestOptions).then(response => {
 
-            let eth = response.data.ETH
+            // let eth = response.data.ETH
+            let eth = response.data.BNB
             global.ethPrice = eth.quote.USD.price
             // console.log(new Date() + 'coinmarketcap API call response:', eth.quote.USD.price);
             res(global.ethPrice)
