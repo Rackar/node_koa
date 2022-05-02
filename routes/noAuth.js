@@ -4,6 +4,7 @@ const users = require("./users/index");
 const upload = require("./upload");
 const person = require("./noauth/person/index");
 const lianyue = require("./noauth/lianyue/addArticle");
+const replay = require("./noauth/replay/index");
 router.prefix("/noauth");
 
 // router.get("/article", async function(ctx, next) {
@@ -23,4 +24,5 @@ router.use(users.routes(), users.allowedMethods()); // /login  /signup
 router.use(upload.routes(), upload.allowedMethods()); // /upload
 router.use(person.routes(), person.allowedMethods()); // /person
 router.use(lianyue.routes(), lianyue.allowedMethods()); // /person
+router.use(replay.routes(), replay.allowedMethods()); // /person
 module.exports = router;
