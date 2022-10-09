@@ -18,5 +18,18 @@ var JiapuSchema = new Schema({
   "vir": String, //丈夫索引编号
   "j": String //简介
 },
-  { strict: false, timestamps: true });
+  {
+    strict: false,
+    // timestamps: true 
+  });
+
+// JiapuSchema.pre('save', function (next) {
+//   let doc = this;
+//   Counter.findByIdAndUpdate({ _id: 'jiapuKey' }, { $inc: { seq: 1 } }, { new: true, upsert: true }, function (error, counter) {
+//     if (error)
+//       return next(error);
+//     doc.key = counter.seq;
+//     next();
+//   });
+// });
 module.exports = mongoose.model("JIAPU", JiapuSchema);
