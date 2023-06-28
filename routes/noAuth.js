@@ -3,6 +3,7 @@ const Article = require("../models/article");
 const users = require("./users/index");
 const upload = require("./upload");
 const person = require("./noauth/person/index");
+const gtysh = require("./noauth/gty/sh");
 const lianyue = require("./noauth/lianyue/addArticle");
 router.prefix("/noauth");
 
@@ -23,4 +24,5 @@ router.use(users.routes(), users.allowedMethods()); // /login  /signup
 router.use(upload.routes(), upload.allowedMethods()); // /upload
 router.use(person.routes(), person.allowedMethods()); // /person
 router.use(lianyue.routes(), lianyue.allowedMethods()); // /person
+router.use(gtysh.routes(), gtysh.allowedMethods()); // /gtysh
 module.exports = router;
