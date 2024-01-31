@@ -1,6 +1,6 @@
 var mongoose = require("mongoose");
 // var testDB = 'mongodb://10.163.6.211:27017/rackar'
-var testDB = "mongodb://localhost:27017/rackar";
+var testDB = "mongodb://127.0.0.1:27017/rackar";
 mongoose.connect(
   testDB,
   { useNewUrlParser: true, useUnifiedTopology: true },
@@ -13,3 +13,4 @@ mongoose.connect(
   }
 );
 module.exports = mongoose;
+//8250 6644

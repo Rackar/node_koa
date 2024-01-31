@@ -157,7 +157,7 @@ async function forceInitData(ctx, next) {
 
   }
 }
-forceInitData({})
+// forceInitData({}) //TODO 先注释掉未知错误
 
 router.prefix("/jiapu");
 
