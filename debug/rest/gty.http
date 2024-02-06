@@ -26,3 +26,8 @@ GET http://{{localhostname}}/noauth/gtysh/test
 GET http://{{localhostname}}/noauth/gtysh/tick
 
 ###
+### 获取聚合结果
+
+GET http://{{localhostname}}/noauth/gtysh/tongji
+
+###
