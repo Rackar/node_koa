@@ -1,4 +1,5 @@
 const router = require("koa-router")();
+const fs = require('fs');
 
 // 爬取国土云审核数据入库，为方便统计省级审核工作量
 
@@ -56,7 +57,7 @@ const axios = require("axios");
 // axios.defaults.baseURL = "/dhl"; // 设置请求URL
 //TODO 1.修改token
 let Basic =
-  "bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI0ZGJkZmYzYi1lZGU4LTQ4NzAtYTI1MC05ZWNiZWQ3YzE0MjYiLCJ1c2VyaWQiOiIxMjU4MTE3ODAiLCJwaG9uZSI6IjE4NjQ3MTE5ODQxIiwidW5pdHR5cGVjb2RlIjoiMTAiLCJsZXZlbCI6IjQiLCJpc2FkbWluIjoiMSIsInVuaXRic20iOiI2MTgwNDJhZC0wNzkyLTRmZjctYTk5NS0wMjBhYTZmMTlmNzkiLCJ1bml0bmFtZSI6IuWGheiSmeWPpOiHquayu-WMuua1i-e7mOWcsOeQhuS_oeaBr-S4reW_gyIsInh6cWRtIjoiMTUwMDAwIiwidXNlcnRpdGxlIjoiIiwicmVhbG5hbWUiOiLmnajml60iLCJkYXRhcG93ZXJ0eXBlIjoiMCIsInVuaXF1ZV9uYW1lIjoiZ3RkY3k0NTM0OTUiLCJyb2xlIjoid2VidXNlciIsIm5iZiI6MTcwNzI0MzU0OSwiZXhwIjoxNzA3MzI5OTQ5LCJpYXQiOjE3MDcyNDM1NDksImlzcyI6Imh0dHA6Ly93d3cua2luZ29pdC5jb20iLCJhdWQiOiJraW5nbyJ9.Qf_Cbyyx1VXo--q-lZpEGb4eQOXgrOmxsutWSy_9qo8";
+  "bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIwMmFjMzJlNC1kZDQ0LTQwYWQtOTRjZS05YWZmODc1N2YxM2IiLCJ1c2VyaWQiOiIxMjU4MTE3ODAiLCJwaG9uZSI6IjE4NjQ3MTE5ODQxIiwidW5pdHR5cGVjb2RlIjoiMTAiLCJsZXZlbCI6IjQiLCJpc2FkbWluIjoiMSIsInVuaXRic20iOiI2MTgwNDJhZC0wNzkyLTRmZjctYTk5NS0wMjBhYTZmMTlmNzkiLCJ1bml0bmFtZSI6IuWGheiSmeWPpOiHquayu-WMuua1i-e7mOWcsOeQhuS_oeaBr-S4reW_gyIsInh6cWRtIjoiMTUwMDAwIiwidXNlcnRpdGxlIjoiIiwicmVhbG5hbWUiOiLmnajml60iLCJkYXRhcG93ZXJ0eXBlIjoiMCIsInVuaXF1ZV9uYW1lIjoiZ3RkY3k0NTM0OTUiLCJyb2xlIjoid2VidXNlciIsIm5iZiI6MTcwNzMxNjQwMywiZXhwIjoxNzA3NDAyODAzLCJpYXQiOjE3MDczMTY0MDMsImlzcyI6Imh0dHA6Ly93d3cua2luZ29pdC5jb20iLCJhdWQiOiJraW5nbyJ9.xysS7kE5xijoTHWcbaIiuv_w4Wt1D6g0Gv31yc3adoc";
 
 async function getShjg(workid,forceUpdateShjg=false) { //已拉取过的审核结果不进行更新
   let data = {
@@ -99,7 +100,7 @@ async function getShjg(workid,forceUpdateShjg=false) { //已拉取过的审核�
 
 async function tick() {
   // let startPage = 1
-  let startPage = 295
+  let startPage = 327
   let pageSize = 100
   let total = await getOnePage(startPage, pageSize);
   console.log(`finish first page ${startPage}`)
@@ -160,9 +161,9 @@ function plusNumber(a, b) {
   return a + b;
 }
 
-function tongjiShengjiShenhe() {
+async function tongjiShengjiShenhe() {
   // 聚合统计 各人的工作量
-  let res = GTYSH.aggregate([
+  let res =await GTYSH.aggregate([
     {$match:{nodename:'省级审核'}}, //筛选条件
     {
         $group: {
@@ -171,32 +172,56 @@ function tongjiShengjiShenhe() {
             count: { $sum: 1 } // 统计每个组中的文档数量
         }
     }])
-    console.log(res)
     let result = {}
+    let shsmMap=["通过","不通过"]
     for (let i = 0; i < res.length; i++) {
       const element = res[i];
+     if(shsmMap.indexOf(element._id.shsm)===-1)continue;
      if(result[element._id.tjry]) {
-      result[element._id.tjry][result[element._id.shsm]]=element.count
+      result[element._id.tjry][element._id.shsm]=element.count
      }else{
       result[element._id.tjry]={}
-      result[element._id.tjry][result[element._id.shsm]]=element.count
+      result[element._id.tjry][element._id.shsm]=element.count
      }
     }
+    let arrayTable=[["姓名","审核类型","数量"]]
     for (const name in result) {
       if (Object.hasOwnProperty.call(result, name)) {
         const shjl = result[name];
         let totalCount=0;
+        
         for (const key in shjl) {
           if (Object.hasOwnProperty.call(shjl, key)) {
             const countlist = shjl[key];
-            console.log(`${name}审核 ${key}: ${countlist}`)
+          //  console.log(`${name}审核 ${key}: ${countlist}`)
             totalCount+=countlist;
+            arrayTable.push([name,key,countlist])
           }
         }
-        console.log(`${name}审核 总数: ${totalCount}`)
+      //  console.log(`${name}审核 总数: ${totalCount}`)
+        arrayTable.push([name,"合计",totalCount])
       }
     }
+    //console.log(arrayTable.toString())
+    writeToTxt(arrayTable)
+}
 
+function writeToTxt(arrayTable) {
+  try {
+    let buffer = ''
+    for (const row of arrayTable) {
+      for (const cell of row) {
+        buffer+=cell+','
+      }
+      buffer+='\r\n'
+    }
+
+    const filename = `${__dirname}\\tongji.txt`;
+    fs.writeFileSync(filename, buffer);
+    console.log(`-----------------结果保存在：${filename}-----------------`);
+  } catch (error) {
+    console.log(`-----------------生成或保存出错：${error}-----------------`);
+  }
 }
 
 function testTick(){
@@ -209,7 +234,8 @@ router.get("/", get);
 router.get("/tick", tick); //遍历所有页面数据
 router.get("/test", testTick); //测试用
 router.get("/last", getlast);
-router.get("/:id", getById);
 router.get("/tongji", tongjiShengjiShenhe);
+
+router.get("/:id", getById); //不能在通配后加固定路由
 
 module.exports = router;
