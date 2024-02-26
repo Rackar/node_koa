@@ -1,0 +1,47 @@
+# @hostname = api.example.com
+# @port = 8080
+# @host = {{hostname}}:{{port}}
+# @contentType = application/json
+
+# ###
+# # @prompt username
+# # @prompt refCode Your reference code display on webpage
+# # @prompt otp Your one-time password in your mailbox
+# POST https://{{host}}/verify-otp/{{refCode}} HTTP/1.1
+# Content-Type: {{contentType}}
+
+# {
+#     "username": "{{username}}",
+#     "otp": "{{otp}}"
+# }
+@localhostname =localhost:3006
+
+### 获取所有
+
+GET http://{{localhostname}}/noauth/shapes/
+
+
+### 添加矢量
+
+POST http://{{localhostname}}/noauth/shapes/  HTTP/1.1
+Content-Type: application/json
+
+{
+    "name": "xxx县第一次审批", 
+    "type": "批地", 
+    "tbbh": "1240193515120321", 
+    "areaCode": "150222", 
+    "setupDate": "20221001", 
+    "setupUnit": "内蒙古自然资源厅", 
+    "location": {
+      "type":"Polygon",
+      "coordinates":[[[111,40],[111.1,40],[111.1,40.1],[111,40.1]]]
+    }
+}
+
+###
+### 获取聚合结果
+
+GET http://{{localhostname}}/noauth/shapes/bypoint
+
+###

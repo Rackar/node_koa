@@ -1,5 +1,5 @@
 const router = require("koa-router")();
-const fs = require('fs');
+const fs = require("fs");
 
 // 爬取国土云审核数据入库，为方便统计省级审核工作量
 
@@ -59,7 +59,8 @@ const axios = require("axios");
 let Basic =
   "bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIwMmFjMzJlNC1kZDQ0LTQwYWQtOTRjZS05YWZmODc1N2YxM2IiLCJ1c2VyaWQiOiIxMjU4MTE3ODAiLCJwaG9uZSI6IjE4NjQ3MTE5ODQxIiwidW5pdHR5cGVjb2RlIjoiMTAiLCJsZXZlbCI6IjQiLCJpc2FkbWluIjoiMSIsInVuaXRic20iOiI2MTgwNDJhZC0wNzkyLTRmZjctYTk5NS0wMjBhYTZmMTlmNzkiLCJ1bml0bmFtZSI6IuWGheiSmeWPpOiHquayu-WMuua1i-e7mOWcsOeQhuS_oeaBr-S4reW_gyIsInh6cWRtIjoiMTUwMDAwIiwidXNlcnRpdGxlIjoiIiwicmVhbG5hbWUiOiLmnajml60iLCJkYXRhcG93ZXJ0eXBlIjoiMCIsInVuaXF1ZV9uYW1lIjoiZ3RkY3k0NTM0OTUiLCJyb2xlIjoid2VidXNlciIsIm5iZiI6MTcwNzMxNjQwMywiZXhwIjoxNzA3NDAyODAzLCJpYXQiOjE3MDczMTY0MDMsImlzcyI6Imh0dHA6Ly93d3cua2luZ29pdC5jb20iLCJhdWQiOiJraW5nbyJ9.xysS7kE5xijoTHWcbaIiuv_w4Wt1D6g0Gv31yc3adoc";
 
-async function getShjg(workid,forceUpdateShjg=false) { //已拉取过的审核结果不进行更新
+async function getShjg(workid, forceUpdateShjg = false) {
+  //已拉取过的审核结果不进行更新
   let data = {
     workid: workid,
     ywlx: "wpzfdktb",
@@ -67,11 +68,11 @@ async function getShjg(workid,forceUpdateShjg=false) { //已拉取过的审核�
     nodeid: null,
   };
 
-  if(!forceUpdateShjg){
-   let res=await GTYRecord.findOne({tbbsm:workid})
-   if(res){
-    return false;
-   }
+  if (!forceUpdateShjg) {
+    let res = await GTYRecord.findOne({ tbbsm: workid });
+    if (res) {
+      return false;
+    }
   }
 
   // let res = await axios.post('https://jg.landcloud.org.cn:8553/webapi/workflow/getworkaudit', data)
@@ -83,9 +84,9 @@ async function getShjg(workid,forceUpdateShjg=false) { //已拉取过的审核�
     headers: {
       Authorization: Basic,
     },
-    timeout:60000
+    timeout: 60000,
   });
-  
+
   let shjl = res.data.data.shjl;
   for (let i = 0; i < shjl.length; i++) {
     const el = shjl[i];
@@ -95,27 +96,76 @@ async function getShjg(workid,forceUpdateShjg=false) { //已拉取过的审核�
       { upsert: true } //当满足查询条件的记录存在,则不执行$setOnInsert中的操作，当满足条件的记录不存在则执行$setOnInsert操作
     );
   }
-  return true
+  return true;
 }
 
 async function tick() {
   // let startPage = 1
-  let startPage = 327
-  let pageSize = 100
+  let startPage = 327;
+  let pageSize = 100;
   let total = await getOnePage(startPage, pageSize);
-  console.log(`finish first page ${startPage}`)
+  console.log(`finish first page ${startPage}`);
   if (total > 0) {
     let count = total / pageSize - 1;
-    for (let i = startPage+1; i < count; i++) {
+    for (let i = startPage + 1; i < count; i++) {
       await getOnePage(i, pageSize);
-      console.log(`finish page ${i}/${count}`)
+      console.log(`finish page ${i}/${count}`);
     }
   }
 }
 
 async function getOnePage(pageIndex = 1, pageSize = 100) {
-//TODO 2.修改查询参数
-  let data = {"ywlx":"wpzfdktb","xzqdm":"","level":1,"userxzqdm":"150000","pageSize":20,"pageIndex":1,"order":"","isUseCacheCount":true,"optype":"21","unitname":"内蒙古自治区测绘地理信息中心","loginsystem":"wpzftb","taskid":54,"querydatatype":0,"conditions":[{"fieldname":"dlrdgdmj","conditiontype":"10","isexportexcelheader":false,"values":["0"],"label":"耕地面积"},{"fieldname":"nodeid","conditiontype":1,"isexportexcelheader":false,"values":["4"],"label":"核查节点"},{"bsm":0,"xzqdm":null,"tbbsm":null,"wzzl":null,"xmmc":null,"xmyt":null,"stq":null,"tdqdfs":null,"fieldname":"lx","conditiontype":1,"talias":null,"values":[230,231],"label":null,"isexportexcelheader":false,"useorquery":false,"totalcondition":"1","type":"child"}]}
+  //TODO 2.修改查询参数
+  let data = {
+    ywlx: "wpzfdktb",
+    xzqdm: "",
+    level: 1,
+    userxzqdm: "150000",
+    pageSize: 20,
+    pageIndex: 1,
+    order: "",
+    isUseCacheCount: true,
+    optype: "21",
+    unitname: "内蒙古自治区测绘地理信息中心",
+    loginsystem: "wpzftb",
+    taskid: 54,
+    querydatatype: 0,
+    conditions: [
+      {
+        fieldname: "dlrdgdmj",
+        conditiontype: "10",
+        isexportexcelheader: false,
+        values: ["0"],
+        label: "耕地面积",
+      },
+      {
+        fieldname: "nodeid",
+        conditiontype: 1,
+        isexportexcelheader: false,
+        values: ["4"],
+        label: "核查节点",
+      },
+      {
+        bsm: 0,
+        xzqdm: null,
+        tbbsm: null,
+        wzzl: null,
+        xmmc: null,
+        xmyt: null,
+        stq: null,
+        tdqdfs: null,
+        fieldname: "lx",
+        conditiontype: 1,
+        talias: null,
+        values: [230, 231],
+        label: null,
+        isexportexcelheader: false,
+        useorquery: false,
+        totalcondition: "1",
+        type: "child",
+      },
+    ],
+  };
 
   data.pageSize = pageSize;
   data.pageIndex = pageIndex;
@@ -127,23 +177,22 @@ async function getOnePage(pageIndex = 1, pageSize = 100) {
     headers: {
       Authorization: Basic,
     },
-    timeout:60000
+    timeout: 60000,
   });
-  
-  
+
   let records = res.data.data.records;
   for (let i = 0; i < records.length; i++) {
     const element = records[i];
-    let iSsRecordNotExist= await getShjg(element.tbbsm);
-    
-    if(iSsRecordNotExist){
-     await GTYRecord.updateOne(
-        {  tbbsm: element.tbbsm }, // 图斑标识相同
+    let iSsRecordNotExist = await getShjg(element.tbbsm);
+
+    if (iSsRecordNotExist) {
+      await GTYRecord.updateOne(
+        { tbbsm: element.tbbsm }, // 图斑标识相同
         { $setOnInsert: element }, //存在则不操作，不存在则新增
         { upsert: true } //当满足查询条件的记录存在,则不执行$setOnInsert中的操作，当满足条件的记录不存在则执行$setOnInsert操作
       );
     }
-    console.log(`finish record ${i+1}/${records.length}`)
+    console.log(`finish record ${i + 1}/${records.length}`);
   }
   //await GTYRecord.insertMany(records)
   return res.data.data.total;
@@ -163,57 +212,58 @@ function plusNumber(a, b) {
 
 async function tongjiShengjiShenhe() {
   // 聚合统计 各人的工作量
-  let res =await GTYSH.aggregate([
-    {$match:{nodename:'省级审核'}}, //筛选条件
+  let res = await GTYSH.aggregate([
+    { $match: { nodename: "省级审核" } }, //筛选条件
     {
-        $group: {
-           // _id: "$tjry", // 分组的关键字段是tjry, 按人员聚合统计。
-             _id: {tjry:"$tjry",shsm:"$shsm"}, // 按照多个字段聚合分组
-            count: { $sum: 1 } // 统计每个组中的文档数量
-        }
-    }])
-    let result = {}
-    let shsmMap=["通过","不通过"]
-    for (let i = 0; i < res.length; i++) {
-      const element = res[i];
-     if(shsmMap.indexOf(element._id.shsm)===-1)continue;
-     if(result[element._id.tjry]) {
-      result[element._id.tjry][element._id.shsm]=element.count
-     }else{
-      result[element._id.tjry]={}
-      result[element._id.tjry][element._id.shsm]=element.count
-     }
+      $group: {
+        // _id: "$tjry", // 分组的关键字段是tjry, 按人员聚合统计。
+        _id: { tjry: "$tjry", shsm: "$shsm" }, // 按照多个字段聚合分组
+        count: { $sum: 1 }, // 统计每个组中的文档数量
+      },
+    },
+  ]);
+  let result = {};
+  let shsmMap = ["通过", "不通过"];
+  for (let i = 0; i < res.length; i++) {
+    const element = res[i];
+    if (shsmMap.indexOf(element._id.shsm) === -1) continue;
+    if (result[element._id.tjry]) {
+      result[element._id.tjry][element._id.shsm] = element.count;
+    } else {
+      result[element._id.tjry] = {};
+      result[element._id.tjry][element._id.shsm] = element.count;
     }
-    let arrayTable=[["姓名","审核类型","数量"]]
-    for (const name in result) {
-      if (Object.hasOwnProperty.call(result, name)) {
-        const shjl = result[name];
-        let totalCount=0;
-        
-        for (const key in shjl) {
-          if (Object.hasOwnProperty.call(shjl, key)) {
-            const countlist = shjl[key];
+  }
+  let arrayTable = [["姓名", "审核类型", "数量"]];
+  for (const name in result) {
+    if (Object.hasOwnProperty.call(result, name)) {
+      const shjl = result[name];
+      let totalCount = 0;
+
+      for (const key in shjl) {
+        if (Object.hasOwnProperty.call(shjl, key)) {
+          const countlist = shjl[key];
           //  console.log(`${name}审核 ${key}: ${countlist}`)
-            totalCount+=countlist;
-            arrayTable.push([name,key,countlist])
-          }
+          totalCount += countlist;
+          arrayTable.push([name, key, countlist]);
         }
-      //  console.log(`${name}审核 总数: ${totalCount}`)
-        arrayTable.push([name,"合计",totalCount])
       }
+      //  console.log(`${name}审核 总数: ${totalCount}`)
+      arrayTable.push([name, "合计", totalCount]);
     }
-    //console.log(arrayTable.toString())
-    writeToTxt(arrayTable)
+  }
+  //console.log(arrayTable.toString())
+  writeToTxt(arrayTable);
 }
 
 function writeToTxt(arrayTable) {
   try {
-    let buffer = ''
+    let buffer = "";
     for (const row of arrayTable) {
       for (const cell of row) {
-        buffer+=cell+','
+        buffer += cell + ",";
       }
-      buffer+='\r\n'
+      buffer += "\r\n";
     }
 
     const filename = `${__dirname}\\tongji.txt`;
@@ -224,8 +274,8 @@ function writeToTxt(arrayTable) {
   }
 }
 
-function testTick(){
-   getOnePage(1, 10);
+function testTick() {
+  getOnePage(1, 10);
 }
 router.prefix("/gtysh");
 

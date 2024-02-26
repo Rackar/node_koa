@@ -8,6 +8,8 @@ const lianyue = require("./noauth/lianyue/addArticle");
 const replay = require("./noauth/replay/index");
 const point = require("./noauth/geo/point");
 const jiapu = require("./noauth/jiapu/jiapu");
+
+const shapes = require("./noauth/shapes/shp");
 router.prefix("/noauth");
 
 // router.get("/article", async function(ctx, next) {
@@ -31,4 +33,6 @@ router.use(gtysh.routes(), gtysh.allowedMethods()); // /gtysh
 router.use(replay.routes(), replay.allowedMethods()); // /person
 router.use(point.routes(), point.allowedMethods()); // /person
 router.use(jiapu.routes(), jiapu.allowedMethods()); // /person
+
+router.use(shapes.routes(), shapes.allowedMethods()); // /person
 module.exports = router;
