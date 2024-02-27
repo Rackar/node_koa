@@ -49,10 +49,15 @@ var getById = async function (ctx, next) {
   };
 };
 
-var getByPoint = async function (ctx, next) {
-  let x = ctx.params.x || 110;
-  let y = ctx.params.y || 40;
-  let result = await searchWithPoint(x, y);
+var getByParams = async function (ctx, next) {
+  let params = ctx.query
+
+  // 删除空参数（以及0）的键
+  let keys= Object.keys(params).filter(key => !params[key])
+  keys.forEach(key=>{delete params[key]})
+    
+
+  let result = await SHP.find(params);
 
   ctx.body = {
     status: 1,
@@ -61,32 +66,83 @@ var getByPoint = async function (ctx, next) {
   };
 };
 
-async function searchWithPoint(lng = 110, lat = 40, distance = 0.01) {
-  let box = pointToBox(lng, lat, distance);
+async function searchWithInPolygon(ctx, next) {
+  let box=[[110.5,41],[112,41],[112,39.5],[110.5,39.5],[110.5,41]]
+  let location = findWithin(box);
   let result = await SHP.find({
-    location: {
-      $geoWithin: {
-        $geometry: {
-          type: "Polygon",
-          coordinates: [box],
-        },
-      },
-    },
+    location
   });
-  return result;
+  ctx.body = {
+    status: 1,
+    msg: "获取数据成功",
+    data: result,
+  };
 }
 
-function pointToBox(lng, lat, distance = 0.01) {
-  let array = [
-    [112, 40],
-    [111, 40],
-    [111, 41],
-    [112, 41],
-    [112, 40],
-  ];
-
-  return array;
+async function searchIntersect(ctx, next) {
+  let box=[[110.5,41],[112,41],[112,39.5],[110.5,39.5],[110.5,41]]
+  let location = findIntersect(box);
+  let result = await SHP.find({
+    location
+  });
+  ctx.body = {
+    status: 1,
+    msg: "获取数据成功",
+    data: result,
+  };
 }
+
+async function searchWithPoint(ctx, next) {
+  let lng = 110.9, lat = 39.9, distance = 50000
+  let location = findNearPoint(lng, lat, distance);
+  let result = await SHP.find({
+    location
+  });
+  ctx.body = {
+    status: 1,
+    msg: "获取数据成功",
+    data: result,
+  };
+}
+
+function findWithin(pointList) {
+ let  location= {
+    $geoWithin: {
+       $geometry: {
+          type: "Polygon", // 可选项，指定要查询的形状类型（点、线或面）
+          coordinates: [pointList] // 包含闭合边界点的数组 pointList= [[x1, y1], [x2, y2], ...]
+       }
+    }
+  }
+  return location
+}
+
+function findIntersect(pointList) {
+  let  location= {
+     $geoIntersects: {
+        $geometry: {
+           type: "Polygon", // 可选项，指定要查询的形状类型（点、线或面）
+           coordinates: [pointList] // 包含闭合边界点的数组 pointList= [[x1, y1], [x2, y2], ...]
+        }
+     }
+   }
+   return location
+ }
+
+function findNearPoint(x,y,distanceInMeters) {
+ let  location={
+    $near: {
+       $geometry: {
+          type: "Point", // 必需项，指定要查询的形状类型为点
+          coordinates: [ x, y ] // 经度和纬度值的数组
+       },
+       $maxDistance: distanceInMeters // 最大距离（单位：米）
+    }
+  }
+  return location
+}
+
+
 
 // 参考 https://www.itzhimei.com/archives/8111.html
 // db.places.find({
@@ -112,7 +168,12 @@ router.prefix("/shapes");
 
 router.post("/", add);
 router.get("/", getAll);
-router.get("/bypoint", getByPoint);
+router.get("/byintersect", searchIntersect);
+router.get("/bybox", searchWithInPolygon);
+router.get("/bypoint", searchWithPoint);
+
+router.get("/find", getByParams);
+
 router.get("/last", getlast);
 
 router.get("/:id", getById);

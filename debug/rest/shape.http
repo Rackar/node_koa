@@ -35,13 +35,23 @@ Content-Type: application/json
     "setupUnit": "内蒙古自然资源厅", 
     "location": {
       "type":"Polygon",
-      "coordinates":[[[111,40],[111.1,40],[111.1,40.1],[111,40.1]]]
+      "coordinates":[[[111,40],[111.1,40],[111.1,40.1],[111,40.1],[111,40]]]
     }
 }
 
 ###
-### 获取聚合结果
+### 获取point结果
 
 GET http://{{localhostname}}/noauth/shapes/bypoint
 
-###
+### 获取box结果
+
+GET http://{{localhostname}}/noauth/shapes/bybox
+
+### 获取相交结果
+
+GET http://{{localhostname}}/noauth/shapes/byintersect
+
+### 获取查询结果
+
+GET http://{{localhostname}}/noauth/shapes/find?tbbh=1240193515120321&&areaCode=
